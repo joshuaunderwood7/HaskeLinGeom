@@ -33,19 +33,19 @@ movePice piece locat
 
 chessBoardMovments piece = [(x,y) | x <- [1..8], y <- [1..8], movement piece (x,y)]
 
-pawnsB   = [makePiece Black Pawn (x,2) | x <- [1..8]]
-rooksB   = [makePiece Black Rook (x,1) | x <- [1,8]]
-knishtsB = [makePiece Black Pawn (x,1) | x <- [2,7]]
-bishopsB = [makePiece Black Pawn (x,1) | x <- [3,5]]
-queenB   = [makePiece Black Pawn (x,1) | x <- [4]]
-kingB    = [makePiece Black Pawn (x,1) | x <- [5]]
+pawnsB   = [makePiece Black Pawn   (x,2) | x <- [1..8]]
+rooksB   = [makePiece Black Rook   (x,1) | x <- [1,8]]
+knishtsB = [makePiece Black Knight (x,1) | x <- [2,7]]
+bishopsB = [makePiece Black Bishop (x,1) | x <- [3,5]]
+queenB   = [makePiece Black Queen  (x,1) | x <- [4]]
+kingB    = [makePiece Black King   (x,1) | x <- [5]]
 
-pawnsW   = [makePiece White Pawn (x,7) | x <- [1..8]]
-rooksW   = [makePiece White Rook (x,8) | x <- [1,8]]
-knishtsW = [makePiece White Pawn (x,8) | x <- [2,7]]
-bishopsW = [makePiece White Pawn (x,8) | x <- [3,5]]
-queenW   = [makePiece White Pawn (x,8) | x <- [4]]
-kingW    = [makePiece White Pawn (x,8) | x <- [5]]
+pawnsW   = [makePiece White Pawn   (x,7) | x <- [1..8]]
+rooksW   = [makePiece White Rook   (x,8) | x <- [1,8]]
+knishtsW = [makePiece White Knight (x,8) | x <- [2,7]]
+bishopsW = [makePiece White Bishop (x,8) | x <- [3,5]]
+queenW   = [makePiece White Queen  (x,8) | x <- [4]]
+kingW    = [makePiece White King   (x,8) | x <- [5]]
 
 main = do
 
