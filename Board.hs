@@ -24,6 +24,7 @@ boardZrange = boardRange minZ maxZ
 chessboard = Board (Just 1) (Just 8) (Just 1) (Just 8) (Just 1) (Just 1) Square
 chessboard3D = Board (Just 1) (Just 8) (Just 1) (Just 8) (Just 1) (Just 8) Square
 chessboardNxN = Board (Just 1) (Nothing) (Just 1) (Nothing) (Just 1) (Just 1) Square
+distanceBoard = Board (Just 1) (Just 15) (Just 1) (Just 15) (Just 1) (Just 1) Square
 
 {--
 main = do 

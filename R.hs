@@ -1,7 +1,8 @@
 module R where
 
 import Board
-defaultBoard = chessboard
+--defaultBoard = chessboard
+defaultBoard = distanceBoard
 
 --This is the default movement based on the board size in 2D
 r fP x y@(y1, y2) 
@@ -11,6 +12,8 @@ r fP x y@(y1, y2)
     | Just y2 < minY defaultBoard = False
     | Just y2 > maxY defaultBoard = False
     | otherwise = fP x y
+
+
 
 --Here are the Movements for Chess
 --pawns are diffucult and this is not corrct

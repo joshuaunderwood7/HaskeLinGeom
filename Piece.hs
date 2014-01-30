@@ -1,6 +1,7 @@
 module Piece where
 
 import R hiding (main)
+import Board hiding (main)
 
 type Location = (Int, Int)
 data Color = Black | White
@@ -31,6 +32,7 @@ movePice piece locat
     | (movement piece) locat = makePiece (color piece) (rank piece) locat 
     | otherwise              = piece
 
+genaricBoardMovments board piece = [(x,y) | x <- (boardXrange board), y <- (boardYrange board), movement piece (x,y)]
 chessBoardMovments piece = [(x,y) | x <- [1..8], y <- [1..8], movement piece (x,y)]
 
 pawnsB   = [makePiece Black Pawn   (x,2) | x <- [1..8]]
