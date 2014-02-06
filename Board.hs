@@ -17,7 +17,6 @@ chessboard3D  = Board (Just 1) (Just 8) (Just 1) (Just 8) (Just 1) (Just 8) Squa
 chessboardNxN = Board (Just 1) (Nothing) (Just 1) (Nothing) (Just 1) (Just 1) Square
 distanceBoard = makeDistanceBoard chessboard
 
-
 boardRange :: (Enum t1, Num t1) => (t -> Maybe t1) -> (t -> Maybe t1) -> t -> [t1]
 boardRange param_min param_max board = 
     case param_min board of
@@ -26,8 +25,11 @@ boardRange param_min param_max board =
             Nothing    -> [min_p..]
         Nothing    -> [-1..1] --TODO: Infinite list in both directions??!
 
+boardXrange :: Board -> [Int]
 boardXrange = boardRange minX maxX
+boardYrange :: Board -> [Int]
 boardYrange = boardRange minY maxY
+boardZrange :: Board -> [Int]
 boardZrange = boardRange minZ maxZ
 
 numberOfSquares2d :: Board -> Int
@@ -44,6 +46,7 @@ doubleMinus1 (Just x) = Just ((x*2)-1)
 --
 
 --emptyTable board = V.replicate (numberOfSquares2d $ makeDistanceBoard board) (-1) 
+emptyTable :: V.Vector Integer
 emptyTable = V.replicate (numberOfSquares2d distanceBoard) (-1) 
 
 translatePairToVector :: (Int, Int) -> Int
@@ -68,9 +71,14 @@ breakIntoRows :: [a] -> [[a]]
 breakIntoRows []   = []
 breakIntoRows list = [x | x <- take 15 list] : breakIntoRows (drop 15 list)
 
+replaceValueWith :: Eq a => a -> a -> a -> a
 replaceValueWith value withThis replaceThis  
     | replaceThis == value = withThis
     | otherwise         = replaceThis
 
+replaceZeroWith :: Integer -> Integer -> Integer
 replaceZeroWith = replaceValueWith 0 
+
+replaceUnreachableWith :: Integer -> Integer -> Integer
 replaceUnreachableWith = replaceValueWith (-1) 
+

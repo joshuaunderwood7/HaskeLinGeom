@@ -5,19 +5,23 @@ import Board
 
 data Color = Black | White
     deriving (Eq)
-data Rank = Pawn | Knight | Bishop | Rook | Queen | King
+data Rank = Pawn | Knight | Bishop | Rook | Queen | King | Obstacle
     deriving (Eq)
 
 data Piece = Piece { movement :: (Location -> Bool) ,
                      color    :: Color ,
                      rank     :: Rank ,
                      location :: Location }
-
+makePiece :: Board -> Color -> Rank -> Location -> Piece
 makePiece board colour rnk locat = Piece (moveFunk board colour rnk locat) colour rnk locat
 
+makeChessPiece :: Color -> Rank -> Location -> Piece
 makeChessPiece = makePiece chessboard
+
+makeChessDistancePiece :: Color -> Rank -> Location -> Piece
 makeChessDistancePiece = makePiece distanceBoard
 
+moveFunk :: Board -> Color -> Rank -> Location -> Location -> Bool
 moveFunk board colour rnk locat
     | rnk == Pawn && colour == White  = (r board) r_pW locat
     | rnk == Pawn && colour == Black  = (r board) r_pB locat
@@ -30,14 +34,22 @@ moveFunk board colour rnk locat
 
 --needs to include more than the movment check, needs to remove oposing piece
 --I think that this would also be a good place to implement Pawn movments...
+
+movePiece :: Board -> Piece -> Location -> Piece
 movePiece board piece locat
     | (movement piece) locat = makePiece board (color piece) (rank piece) locat 
     | otherwise              = piece
 
+moveChessPiece :: Piece -> Location -> Piece
 moveChessPiece = movePiece chessboard
+
+moveChessDistancePiece :: Piece -> Location -> Piece
 moveChessDistancePiece = movePiece distanceBoard
 
+genaricBoardMovments :: Board -> Piece -> [Location]
 genaricBoardMovments board piece = [(x,y) | x <- (boardXrange board), y <- (boardYrange board), movement piece (x,y)]
+
+chessBoardMovments :: Piece -> [Location]
 chessBoardMovments piece = [(x,y) | x <- [1..8], y <- [1..8], movement piece (x,y)]
 
 pawnsB   = [makeChessPiece Black Pawn   (x,2) | x <- [1..8]]

@@ -7,14 +7,17 @@ import Board
 import R
 
 
+getFirstDupe :: Eq a => [a] -> a
 getFirstDupe (x:y:z)
     | x == y    = x
     | otherwise = getFirstDupe $ y:z
 
+generateDistenceTable :: Color -> Rank -> V.Vector Integer
 generateDistenceTable color piece = do
     let listOfTables = generateDistenceTable' color piece
     getFirstDupe listOfTables
 
+generateDistenceTable' :: Color -> Rank -> [V.Vector Integer]
 generateDistenceTable' color piece = do
     --let startingTable = V.update (emptyTable chessboard) $ V.fromList [(translatePairToVector(8,8), 0)]
     let startingTable = V.update (emptyTable) $ V.fromList [(translatePairToVector(8,8), 0)]
@@ -25,6 +28,9 @@ generateDistenceTable' color piece = do
     let oneMove = V.update startingTable $ V.fromList vecUpdatePairs
     oneMove : (generateDistenceTable'' validMoves oneMove (accum + 1) color piece )
 
+generateDistenceTable'' ::
+  (Eq b, Num b) =>
+  [(Int, Int)] -> V.Vector b -> b -> Color -> Rank -> [V.Vector b]
 generateDistenceTable'' validMoves lastMove accum color piece = do
     let newPieces = map (makeChessDistancePiece color piece ) validMoves
     let validMoves2 = nub.concat $ map (genaricBoardMovments distanceBoard) newPieces
