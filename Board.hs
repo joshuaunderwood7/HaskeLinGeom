@@ -49,6 +49,10 @@ doubleMinus1 (Just x) = Just ((x*2)-1)
 emptyTable :: V.Vector Integer
 emptyTable = V.replicate (numberOfSquares2d distanceBoard) (-1) 
 
+placeObst :: V.Vector Integer -> [Location] -> V.Vector Integer
+placeObst table []     = table
+placeObst table locals = V.update table $ V.fromList $ zip (map translatePairToVector locals) (repeat (-2)) 
+
 translatePairToVector :: (Int, Int) -> Int
 translatePairToVector pair@(x,y) = (x-1) + ((y-1) * 15)
 
@@ -66,6 +70,16 @@ displayTableToString tableName table = do
     tableName ++ "\n" ++ (unlines.(map unwords) $ displaiedTable)
     where xUnreach = (replaceValueWith "-1" "X")
           poundObstical = (replaceValueWith "-2" "#")
+
+displayTableToPython  :: (Show a) => String -> V.Vector a-> String
+displayTableToPython tableName table = do
+    show $ zip [(x,y,z) | x<-[1..5], y<-[1..15], z<-[1]] $ concat.map (poundObstical.xUnreach.show) $ V.toList table
+    where xUnreach = (replaceValueWith "-1" "X")
+          poundObstical = (replaceValueWith "-2" "#")
+
+entwine []  _    = [] 
+entwine (x:[]) _ = [x] 
+entwine (x:xs) str = [x] ++ str ++ (entwine xs str)
 
 breakIntoRows :: [a] -> [[a]]
 breakIntoRows []   = []
