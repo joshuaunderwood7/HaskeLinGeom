@@ -1,8 +1,9 @@
 module Main where
 
 import System.Environment
-import Control.Exception
+import Control.Exception as EX
 import Data.Char (toUpper)
+import qualified Data.Vector as V
 import Board
 import Piece
 import DistanceTables
@@ -34,10 +35,22 @@ mainProgram = do
 --    putStrLn $ displayTableToPython tablename $ distance_table 
 
 showHelp :: SomeException -> IO ()
-showHelp _ = putStrLn $ "The program requires command line input.\nAlthough it is assumed \
+showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough it is assumed \
     \that the board is 8x8x1 for now. Try entering this: \n\
     \\n \
     \compiled/Distance \"Rook\" Black Rook 4 4 1 4 7 1 4 2 1 5 4 1"
+    --}
+    do
+        displayTable "x Rook" x
+        displayTable "y Rook" y
+        displayTable "oval Rook" xy
+        where y = generateDistenceTableObst (map (\x -> (7 - (fst x) + 8, 8 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black Rook
+              x = generateDistenceTableObst (map (\x -> (4 - (fst x) + 8, 4 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black Rook
+              xy = V.zipWith mixVectors x y
 
-main = catch mainProgram showHelp
-    
+mixVectors x y
+    | x <= 0 = x
+    | y <= 0 = y
+    | otherwise = x + y
+
+main = EX.catch mainProgram showHelp
