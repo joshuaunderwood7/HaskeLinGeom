@@ -18,7 +18,7 @@ chessboardNxN = Board (Just 1) (Nothing) (Just 1) (Nothing) (Just 1) (Just 1) Sq
 distanceBoard = makeDistanceBoard chessboard
 
 boardRange :: (Enum t1, Num t1) => (t -> Maybe t1) -> (t -> Maybe t1) -> t -> [t1]
-boardRange param_min param_max board = 
+boardRange param_min param_max board =
     case param_min board of
         Just min_p -> case param_max board of
             Just max_p -> [min_p..max_p]
@@ -45,13 +45,13 @@ doubleMinus1 (Just x) = Just ((x*2)-1)
 --board functions---
 --
 
---emptyTable board = V.replicate (numberOfSquares2d $ makeDistanceBoard board) (-1) 
+--emptyTable board = V.replicate (numberOfSquares2d $ makeDistanceBoard board) (-1)
 emptyTable :: V.Vector Integer
-emptyTable = V.replicate (numberOfSquares2d distanceBoard) (-1) 
+emptyTable = V.replicate (numberOfSquares2d distanceBoard) (-1)
 
 placeObst :: V.Vector Integer -> [Location] -> V.Vector Integer
 placeObst table []     = table
-placeObst table locals = V.update table $ V.fromList $ zip (map translatePairToVector locals) (repeat (-2)) 
+placeObst table locals = V.update table $ V.fromList $ zip (map translatePairToVector locals) (repeat (-2))
 
 translatePairToVector :: (Int, Int) -> Int
 translatePairToVector pair@(x,y) = (x-1) + ((y-1) * 15)
@@ -83,7 +83,14 @@ entwine (x:xs) str = [x] ++ str ++ (entwine xs str)
 
 breakIntoRows :: [a] -> [[a]]
 breakIntoRows []   = []
-breakIntoRows list = [x | x <- take 15 list] : breakIntoRows (drop 15 list)
+breakIntoRows list = do
+            let squareRoot = floor . sqrt . (fromIntegral :: Int -> Double)
+            let base = squareRoot (length list)
+            [x | x <- take base list] : breakIntoRows' base (drop base list)
+
+breakIntoRows' :: Int -> [a] -> [[a]]
+breakIntoRows' _ [] = []
+breakIntoRows' size list  = [x | x <- take size list] : breakIntoRows' size (drop size list)
 
 replaceValueWith :: Eq a => a -> a -> a -> a
 replaceValueWith value withThis replaceThis  

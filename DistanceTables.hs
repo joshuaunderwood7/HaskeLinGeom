@@ -2,7 +2,7 @@ module DistanceTables where
 
 import qualified Data.Vector as V
 import Control.Parallel.Strategies
-import Data.List (nub)
+import Data.List (nub, transpose)
 import Piece
 import Board
 import R
@@ -14,28 +14,19 @@ getFirstDupe (x:y:z)
     | otherwise = getFirstDupe $ y:z
 
 
-{--
-pointsBetweenOk :: (Eq b, Num b) => V.Vector b -> Location -> Piece -> Bool
-pointsBetweenOk lastMove local piece = do
-    let xy = [(x,y) | x <- [(fst local) .. ((fst.location) piece)] , (x /= fst local) , (x /= ((fst.location) piece)),
-                      y <- [(snd local) .. ((snd.location) piece)] , (y /= snd local) , (y /= ((snd.location) piece))]
-    let listOfBools = map (\x-> lastMove V.! (translatePairToVector x == (-2))) xy
-    and listOfBools
---}
-
-generateDistenceTableObst :: [Location] -> Color -> Rank -> V.Vector Integer 
+generateDistenceTableObst :: [Location] -> Color -> Rank -> V.Vector Integer
 generateDistenceTableObst obst color piece = do
     let startingTable = placeObst (V.update (emptyTable) $ V.fromList [(translatePairToVector(8,8), 0)]) obst
     let accum = 0
     let validMoves = [(8,8)]
-    getFirstDupe $ generateDistenceTable' validMoves startingTable (accum + 1) color piece 
+    getFirstDupe $ generateDistenceTable' validMoves startingTable (accum + 1) color piece
 
 generateDistenceTable :: Color -> Rank -> V.Vector Integer
 generateDistenceTable color piece = do
     let startingTable = V.update (emptyTable) $ V.fromList [(translatePairToVector(8,8), 0)]
     let accum = 0
     let validMoves = [(8,8)]
-    getFirstDupe $ generateDistenceTable' validMoves startingTable (accum + 1) color piece 
+    getFirstDupe $ generateDistenceTable' validMoves startingTable (accum + 1) color piece
 
 generateDistenceTable' ::
   (Eq b, Num b) => [Location] -> V.Vector b -> b -> Color -> Rank -> [V.Vector b]
@@ -51,4 +42,9 @@ generateDistenceTable' validMoves lastMove accum color piece = do
     let newMove = V.update lastMove $ V.fromList vecUpdatePairs2
 
     newMove : (generateDistenceTable' validMoves2 newMove (accum + 1) color piece )
+
+applyToChessBoard :: Location -> V.Vector a -> V.Vector a
+applyToChessBoard locat@(x0, y0) dTable = V.fromList [dTable V.! translatePairToVector(x) | x <- offsetBoard]
+    where offsetBoard =  [(x,y) | y <- [y0..7+y0], x <- [x0..7+x0]]
+--    where offsetBoard = [(x,y) | y <- [(7+x0), (6+x0) .. x0], x <- [(7+x0), (6 + x0) ..x0]]
 

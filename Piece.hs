@@ -31,6 +31,12 @@ data Piece = Piece { movement :: (Location -> Bool) ,
                      rank     :: Rank ,
                      location :: Location }
 
+on :: Location -> [Piece] -> [Piece]
+on x ps = [p | p <- ps, (location p) == x]
+
+on1 :: Location -> [Piece] -> Piece
+on1 x ps = head $ on x ps
+
 makePiece :: Board -> Color -> Rank -> Location -> Piece
 makePiece board colour rnk locat = Piece (moveFunk board colour rnk locat) colour rnk locat
 

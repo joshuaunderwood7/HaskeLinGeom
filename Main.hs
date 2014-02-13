@@ -19,20 +19,20 @@ strToLocation str = do
 -- runghc Main.hs "Queen" Black Queen 8 8 1 4 4 1 8 1 1 3 2 1
 ---main :: String -> Color -> Rank -> Int Int Int-> [Int Int Int] -> DistanceTable
 
-mainProgram = do 
+mainProgram = do
     args <- getArgs
     let tablename = head args
     let colour = head  $ drop 1 args
     let rnk = head $ drop 2 args
     let obst = strToLocation $ drop 6 args
 
-    let locat = (read (head (drop 3 args)) :: Int , read (head (drop 4 args)) :: Int ) 
+    let locat = (read (head (drop 3 args)) :: Int , read (head (drop 4 args)) :: Int )
 
     let offserObst = map (\x -> ((fst locat) - (fst x) + 8, (snd locat) - (snd x) + 8) )  obst
 
-    let distance_table = generateDistenceTableObst offserObst (getColorFromString colour) (getRankFromString rnk) 
-    displayTable tablename $ distance_table  
---    putStrLn $ displayTableToPython tablename $ distance_table 
+    let distance_table = generateDistenceTableObst offserObst (getColorFromString colour) (getRankFromString rnk)
+    displayTable tablename $ distance_table
+--    putStrLn $ displayTableToPython tablename $ distance_table
 
 showHelp :: SomeException -> IO ()
 showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough it is assumed \
@@ -42,15 +42,20 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
     --}
     do
         displayTable "x Rook" x
+        displayTable "cbx Rook" cbx
         displayTable "y Rook" y
+        displayTable "cby Rook" cby
         displayTable "oval Rook" xy
-        where y = generateDistenceTableObst (map (\x -> (7 - (fst x) + 8, 8 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black Rook
-              x = generateDistenceTableObst (map (\x -> (4 - (fst x) + 8, 4 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black Rook
-              xy = V.zipWith mixVectors x y
+        putStrLn "bye."
+        where y = generateDistenceTableObst (map (\x -> (7 - (fst x) + 8, 3 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black King
+              x = generateDistenceTableObst (map (\x -> (5 - (fst x) + 8, 8 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black King
+              cbx = applyToChessBoard (5,8) x
+              cby = applyToChessBoard (7,3) y
+              xy = V.zipWith mixVectors cbx cby
 
 mixVectors x y
-    | x <= 0 = x
-    | y <= 0 = y
+    | x < 0 = x
+    | y < 0 = y
     | otherwise = x + y
 
 main = EX.catch mainProgram showHelp
