@@ -41,21 +41,22 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
     \compiled/Distance \"Rook\" Black Rook 4 4 1 4 7 1 4 2 1 5 4 1"
     --}
     do
-        displayTable "x Rook" x
+        let testPieceX = makeChessPiece Black King (7,3)
+        let testPieceY = makeChessPiece Black King (5,8)
+        let obst = [(4,7),(4,2),(5,4)]
+        let cbx = appliedDistenceTable testPieceX obst
+        let cby = appliedDistenceTable testPieceY obst
+--        displayTable "x Rook" x
         displayTable "cbx Rook" cbx
-        displayTable "y Rook" y
+--        displayTable "y Rook" y
         displayTable "cby Rook" cby
-        displayTable "oval Rook" xy
+--        displayTable "oval Rook" xy
+        displayTable "SUM table" $ sumTable cbx cby
         putStrLn "bye."
-        where y = generateDistenceTableObst (map (\x -> (7 - (fst x) + 8, 3 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black King
-              x = generateDistenceTableObst (map (\x -> (5 - (fst x) + 8, 8 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black King
-              cbx = applyToChessBoard (5,8) x
-              cby = applyToChessBoard (7,3) y
-              xy = V.zipWith mixVectors cbx cby
+--        where y = generateDistenceTableObst (map (\x -> (7 - (fst x) + 8, 3 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black King
+--              x = generateDistenceTableObst (map (\x -> (5 - (fst x) + 8, 8 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black King
+--              xy = V.zipWith mixVectors cbx cby
 
-mixVectors x y
-    | x < 0 = x
-    | y < 0 = y
-    | otherwise = x + y
+
 
 main = EX.catch mainProgram showHelp

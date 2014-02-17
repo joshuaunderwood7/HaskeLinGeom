@@ -48,3 +48,15 @@ applyToChessBoard locat@(x0, y0) dTable = V.fromList [dTable V.! translatePairTo
     where offsetBoard =  [(x,y) | y <- [y0..7+y0], x <- [x0..7+x0]]
 --    where offsetBoard = [(x,y) | y <- [(7+x0), (6+x0) .. x0], x <- [(7+x0), (6 + x0) ..x0]]
 
+appliedDistenceTable piece obstList = do
+    applyToChessBoard (location piece) $ generateDistenceTableObst (map (\x -> (xLocat - (fst x) + 8, yLocat - (snd x) + 8) ) obstList) (color piece) (rank piece)
+    where xLocat = fst $ location piece
+          yLocat = snd $ location piece
+
+
+sumTable x y = V.zipWith mixVectors x y
+
+mixVectors x y
+    | x < 0 = x
+    | y < 0 = y
+    | otherwise = x + y
