@@ -46,16 +46,17 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
         let obst = [(4,7),(4,2),(5,4)]
         let cbx = appliedDistenceTable testPieceX obst
         let cby = appliedDistenceTable testPieceY obst
---        displayTable "x Rook" x
-        displayTable "cbx Rook" cbx
---        displayTable "y Rook" y
-        displayTable "cby Rook" cby
---        displayTable "oval Rook" xy
+        let smallRingX = smallRing obst testPieceX
+        let bigRingX = bigRing cbx 1
+        let ovalX = oval (sumTable cbx cby) 5
+        displayTable "cbx" cbx
+        displayTable "cby" cby
         displayTable "SUM table" $ sumTable cbx cby
+        displayTable "smallring" smallRingX
+        displayTable "bigRing" bigRingX
+        displayTable "oval" ovalX
+        displayTable "next_j" $ nextj_all smallRingX bigRingX ovalX
         putStrLn "bye."
---        where y = generateDistenceTableObst (map (\x -> (7 - (fst x) + 8, 3 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black King
---              x = generateDistenceTableObst (map (\x -> (5 - (fst x) + 8, 8 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black King
---              xy = V.zipWith mixVectors cbx cby
 
 
 
