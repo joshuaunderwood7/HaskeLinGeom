@@ -36,8 +36,10 @@ bigRing dTable dist = V.map substituteDist dTable
 oval :: V.Vector Integer -> Integer -> V.Vector Integer
 oval sumTable length = bigRing sumTable length
 
-nextj_all smallR bigR ovl = V.map and3 (V.zip3 smallR bigR ovl)
+nextj_all_table smallR bigR ovl =  V.map and3 (V.zip3 smallR bigR ovl)
     where and3 = (\(x,y,z) -> if (x==1&&y==1&&z==1) then 1 else 0)
+
+nextj_all smallR bigR ovl = getNext_jLocations $ nextj_all_table smallR bigR ovl
 
 generateDistenceTable :: Color -> Rank -> V.Vector Integer
 generateDistenceTable color piece = do
@@ -72,10 +74,34 @@ appliedDistenceTable piece obstList = do
           yLocat = snd $ location piece
 
 
+sumTable :: (Num c, Ord c) => V.Vector c -> V.Vector c -> V.Vector c
 sumTable x y = V.zipWith mixVectors x y
 
+mixVectors :: (Num a, Ord a) =>a -> a -> a
 mixVectors x y
     | x < 0 = x
     | y < 0 = y
     | otherwise = x + y
 
+--indexToChessLocation :: Integer -> Location
+indexToChessLocation index = (8-(index `mod` 8),8-(index `div` 8))
+
+getIndexOfnonZero table = filter (>=0) $ getIndexOfnonZero' table 0
+getIndexOfnonZero' table index
+    | V.length table > index = (if table V.! index /= 0 then index else -1) : getIndexOfnonZero' table (index + 1)
+    | otherwise              = []
+
+getNext_jLocations table = map indexToChessLocation $ getIndexOfnonZero table
+
+buildTrajectoryBundle piece newLocation obsticals = do
+        let x = piece
+        let y = moveChessPieceUnchecked x newLocation
+        let cbx = appliedDistenceTable x obsticals
+        let cby = appliedDistenceTable y obsticals
+        let smallRingX = smallRing obsticals x
+        let bigRingX = bigRing cbx 1
+        let ovalX = oval (sumTable cbx cby) 5
+        let next_j = nextj_all smallRingX bigRingX ovalX
+        next_j
+
+buildTrajectoryBundle' piece destination bigRingDist oval = 1

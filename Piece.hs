@@ -62,8 +62,11 @@ moveFunk board colour rnk locat
 
 movePiece :: Board -> Piece -> Location -> Piece
 movePiece board piece locat
-    | (movement piece) locat = makePiece board (color piece) (rank piece) locat 
+    | (movement piece) locat = makePiece board (color piece) (rank piece) locat
     | otherwise              = piece
+
+movePieceUnchecked board piece locat = makePiece board (color piece) (rank piece) locat
+moveChessPieceUnchecked = movePieceUnchecked chessboard
 
 moveChessPiece :: Piece -> Location -> Piece
 moveChessPiece = movePiece chessboard
@@ -75,29 +78,29 @@ moveChessDistancePiece = movePiece distanceBoard
 --This prevents the pieces from being able to pass through another piece.
 --There is an added bennifit that this is slightly faster than the (every
 --possible move) method used for the genaricBoardMovments.
-upLeft    loc = [((fst loc) + x, (snd loc) + x) | x <- [1..8]]                     
-upRight   loc = [((fst loc) - x, (snd loc) + x) | x <- [1..8]]                     
-downLeft  loc = [((fst loc) + x, (snd loc) - x) | x <- [1..8]]                     
-downRight loc = [((fst loc) - x, (snd loc) - x) | x <- [1..8]]                     
-                                                                                
-left  loc = [((fst loc) + x,(snd loc)) | x <- [1..8]]                              
-right loc = [((fst loc) - x,(snd loc)) | x <- [1..8]]                              
-up    loc = [((fst loc),(snd loc) + x) | x <- [1..8]]                              
-down  loc = [((fst loc),(snd loc) - x) | x <- [1..8]]                              
+upLeft    loc = [((fst loc) + x, (snd loc) + x) | x <- [1..8]]
+upRight   loc = [((fst loc) - x, (snd loc) + x) | x <- [1..8]]
+downLeft  loc = [((fst loc) + x, (snd loc) - x) | x <- [1..8]]
+downRight loc = [((fst loc) - x, (snd loc) - x) | x <- [1..8]]
 
-knightMoves loc = [(x,y) | x <- [((fst loc) - 2) .. ((fst loc) + 2)], y <- [((snd loc) + 2) .. ((snd loc) - 2)]] 
+left  loc = [((fst loc) + x,(snd loc)) | x <- [1..8]]
+right loc = [((fst loc) - x,(snd loc)) | x <- [1..8]]
+up    loc = [((fst loc),(snd loc) + x) | x <- [1..8]]
+down  loc = [((fst loc),(snd loc) - x) | x <- [1..8]]
+
+knightMoves loc = [(x,y) | x <- [((fst loc) - 2) .. ((fst loc) + 2)], y <- [((snd loc) + 2) .. ((snd loc) - 2)]]
 
 advancedBoardMovments :: (Eq a, Num a) => V.Vector a -> Piece -> [(Int, Int)]
-advancedBoardMovments table piece 
+advancedBoardMovments table piece
     | (rank piece) == Pawn && (color piece) == Black =  filterObst [x | x <- (up (location piece))]
     | (rank piece) == Pawn && (color piece) == White =  filterObst [x | x <- (down (location piece))]
-    | (rank piece) == Bishop = (filterObst [x | x <- (upLeft (location piece))]) ++ (filterObst [x | x <- (downLeft (location piece))]) 
+    | (rank piece) == Bishop = (filterObst [x | x <- (upLeft (location piece))]) ++ (filterObst [x | x <- (downLeft (location piece))])
                           ++ (filterObst [x | x <- (upRight (location piece))]) ++ (filterObst [x | x <- (downRight (location piece))])
-    | (rank piece) == Rook = (filterObst [x | x <- (up (location piece))]) ++ (filterObst [x | x <- (down (location piece))]) 
+    | (rank piece) == Rook = (filterObst [x | x <- (up (location piece))]) ++ (filterObst [x | x <- (down (location piece))])
                           ++ (filterObst [x | x <- (left (location piece))]) ++ (filterObst [x | x <- (right (location piece))])
-    | (rank piece) == Queen = (filterObst [x | x <- (up (location piece))]) ++ (filterObst [x | x <- (down (location piece))]) 
+    | (rank piece) == Queen = (filterObst [x | x <- (up (location piece))]) ++ (filterObst [x | x <- (down (location piece))])
                           ++ (filterObst [x | x <- (left (location piece))]) ++ (filterObst [x | x <- (right (location piece))])
-                          ++ (filterObst [x | x <- (upLeft (location piece))]) ++ (filterObst [x | x <- (downLeft (location piece))]) 
+                          ++ (filterObst [x | x <- (upLeft (location piece))]) ++ (filterObst [x | x <- (downLeft (location piece))])
                           ++ (filterObst [x | x <- (upRight (location piece))]) ++ (filterObst [x | x <- (downRight (location piece))])
     | (rank piece) == Knight = filterObstKnight $ genaricBoardMovments distanceBoard piece
     | (rank piece) == King   = genaricBoardMovments distanceBoard piece

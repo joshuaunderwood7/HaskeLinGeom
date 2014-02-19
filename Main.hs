@@ -42,20 +42,25 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
     --}
     do
         let testPieceX = makeChessPiece Black King (7,3)
-        let testPieceY = makeChessPiece Black King (5,8)
+        let testPieceY = moveChessPieceUnchecked testPieceX (5,8)
+        --print $ location testPieceY
         let obst = [(4,7),(4,2),(5,4)]
         let cbx = appliedDistenceTable testPieceX obst
         let cby = appliedDistenceTable testPieceY obst
-        let smallRingX = smallRing obst testPieceX
-        let bigRingX = bigRing cbx 1
+        let smallRingX = smallRing obst $ moveChessPieceUnchecked testPieceX (5,7)
+        let bigRingX = bigRing cbx 5
         let ovalX = oval (sumTable cbx cby) 5
+
         displayTable "cbx" cbx
         displayTable "cby" cby
         displayTable "SUM table" $ sumTable cbx cby
         displayTable "smallring" smallRingX
         displayTable "bigRing" bigRingX
         displayTable "oval" ovalX
-        displayTable "next_j" $ nextj_all smallRingX bigRingX ovalX
+        displayTable "next_j" $ nextj_all_table smallRingX bigRingX ovalX
+        let next_j = nextj_all smallRingX bigRingX ovalX
+        print next_j
+        
         putStrLn "bye."
 
 
