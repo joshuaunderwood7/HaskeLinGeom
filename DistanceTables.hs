@@ -73,7 +73,7 @@ appliedDistenceTable piece obstList = do
     where xLocat = fst $ location piece
           yLocat = snd $ location piece
 
-mapx_p cbx destination = cbx V.! translatePairToVector destination
+mapx_p table destination = table V.! (translateChessPairToVector destination)
 
 sumTable :: (Num c, Ord c) => V.Vector c -> V.Vector c -> V.Vector c
 sumTable x y = V.zipWith mixVectors x y
@@ -108,7 +108,7 @@ getNext_jLocations table = map indexToChessLocation $ getIndexOfnonZero table
 
 buildTrajectoryBundle loopCount piece destination obsticals
     | location piece == destination = location piece : []
-    | loopCount >= 2 = []
+    | loopCount >= 124 = []
     | otherwise = do
         let x = piece
         let y = moveChessPieceUnchecked x destination
@@ -118,5 +118,13 @@ buildTrajectoryBundle loopCount piece destination obsticals
         let bigRingX = bigRing cbx loopCount
         let ovalX = oval (sumTable cbx cby) (mapx_p cbx destination)
         let next_j = head $ nextj_all smallRingX bigRingX ovalX
-        location piece : buildTrajectoryBundle (loopCount + 1) (moveChessPieceUnchecked x next_j) destination obsticals
+        location piece : bJT' (loopCount + 1) (moveChessPieceUnchecked x next_j) destination obsticals cbx ovalX
 
+bJT' loopCount piece destination obsticals cbx oval
+    | location piece == destination = location piece : []
+    | loopCount >= 124 = []
+    | otherwise = do
+        let smallRingX = smallRing obsticals piece
+        let bigRingX = bigRing cbx loopCount
+        let next_j = head $ nextj_all smallRingX bigRingX oval
+        location piece : bJT' (loopCount + 1) (moveChessPieceUnchecked piece next_j) destination obsticals cbx oval

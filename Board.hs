@@ -55,6 +55,7 @@ placeObst table locals = V.update table $ V.fromList $ zip (map translatePairToV
 
 translatePairToVector :: (Int, Int) -> Int
 translatePairToVector pair@(x,y) = (x-1) + ((y-1) * 15)
+translateChessPairToVector pair@(x,y) = (8-x) + ((8-y) * 8)
 
 displayTable  :: (Show a) => String -> V.Vector a-> IO ()
 displayTable tableName table = do

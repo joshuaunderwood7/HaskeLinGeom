@@ -41,15 +41,16 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
     \compiled/Distance \"Rook\" Black Rook 4 4 1 4 7 1 4 2 1 5 4 1"
     --}
     do
+        let obst = [(4,7),(4,2),(5,4)]
+        {--
         let testPieceX = makeChessPiece Black King (7,3)
         let testPieceY = moveChessPieceUnchecked testPieceX (5,8)
         --print $ location testPieceY
-        let obst = [(4,7),(4,2),(5,4)]
         let cbx = appliedDistenceTable testPieceX obst
         let cby = appliedDistenceTable testPieceY obst
         let smallRingX = smallRing obst $ moveChessPieceUnchecked testPieceX (7,3)
         let bigRingX = bigRing cbx 1
-        let ovalX = oval (sumTable cbx cby) 5
+        let ovalX = oval (sumTable cbx cby) (mapx_p cbx (5,8))
 
         displayTable "cbx" cbx
         displayTable "cby" cby
@@ -60,8 +61,11 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
         displayTable "next_j" $ nextj_all_table smallRingX bigRingX ovalX
         let next_j = nextj_all smallRingX bigRingX ovalX
 
-        print next_j
-        print $ buildTrajectoryBundle 1 (makeChessPiece Black King (7,3)) (5,7) obst
+        --print $ mapx_p cbx (5,8)
+        --print $ translateChessPairToVector (5,8)
+        --print $ cbx V.! 0
+        --}
+        print $ buildTrajectoryBundle 1 (makeChessPiece Black King (7,3)) (5,8) obst
 
         putStrLn "bye."
 
