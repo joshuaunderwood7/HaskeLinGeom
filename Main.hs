@@ -47,8 +47,8 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
         let obst = [(4,7),(4,2),(5,4)]
         let cbx = appliedDistenceTable testPieceX obst
         let cby = appliedDistenceTable testPieceY obst
-        let smallRingX = smallRing obst $ moveChessPieceUnchecked testPieceX (5,7)
-        let bigRingX = bigRing cbx 5
+        let smallRingX = smallRing obst $ moveChessPieceUnchecked testPieceX (7,3)
+        let bigRingX = bigRing cbx 1
         let ovalX = oval (sumTable cbx cby) 5
 
         displayTable "cbx" cbx
@@ -59,8 +59,10 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
         displayTable "oval" ovalX
         displayTable "next_j" $ nextj_all_table smallRingX bigRingX ovalX
         let next_j = nextj_all smallRingX bigRingX ovalX
+
         print next_j
-        
+        print $ buildTrajectoryBundle 1 (makeChessPiece Black King (7,3)) (5,7) obst
+
         putStrLn "bye."
 
 

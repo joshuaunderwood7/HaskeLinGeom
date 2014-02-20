@@ -73,6 +73,7 @@ appliedDistenceTable piece obstList = do
     where xLocat = fst $ location piece
           yLocat = snd $ location piece
 
+mapx_p cbx destination = cbx V.! translatePairToVector destination
 
 sumTable :: (Num c, Ord c) => V.Vector c -> V.Vector c -> V.Vector c
 sumTable x y = V.zipWith mixVectors x y
@@ -86,6 +87,18 @@ mixVectors x y
 --indexToChessLocation :: Integer -> Location
 indexToChessLocation index = (8-(index `mod` 8),8-(index `div` 8))
 
+locationOnChessboard :: Location -> String
+locationOnChessboard (x,y)
+    | x == 8 = "a" ++ (show y)
+    | x == 7 = "b" ++ (show y)
+    | x == 6 = "c" ++ (show y)
+    | x == 5 = "d" ++ (show y)
+    | x == 4 = "e" ++ (show y)
+    | x == 3 = "f" ++ (show y)
+    | x == 2 = "g" ++ (show y)
+    | x == 1 = "h" ++ (show y)
+    | otherwise = "xx"
+
 getIndexOfnonZero table = filter (>=0) $ getIndexOfnonZero' table 0
 getIndexOfnonZero' table index
     | V.length table > index = (if table V.! index /= 0 then index else -1) : getIndexOfnonZero' table (index + 1)
@@ -93,15 +106,17 @@ getIndexOfnonZero' table index
 
 getNext_jLocations table = map indexToChessLocation $ getIndexOfnonZero table
 
-buildTrajectoryBundle piece newLocation obsticals = do
+buildTrajectoryBundle loopCount piece destination obsticals
+    | location piece == destination = location piece : []
+    | loopCount >= 2 = []
+    | otherwise = do
         let x = piece
-        let y = moveChessPieceUnchecked x newLocation
+        let y = moveChessPieceUnchecked x destination
         let cbx = appliedDistenceTable x obsticals
         let cby = appliedDistenceTable y obsticals
         let smallRingX = smallRing obsticals x
-        let bigRingX = bigRing cbx 1
-        let ovalX = oval (sumTable cbx cby) 5
-        let next_j = nextj_all smallRingX bigRingX ovalX
-        next_j
+        let bigRingX = bigRing cbx loopCount
+        let ovalX = oval (sumTable cbx cby) (mapx_p cbx destination)
+        let next_j = head $ nextj_all smallRingX bigRingX ovalX
+        location piece : buildTrajectoryBundle (loopCount + 1) (moveChessPieceUnchecked x next_j) destination obsticals
 
-buildTrajectoryBundle' piece destination bigRingDist oval = 1
