@@ -65,7 +65,9 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
         --print $ translateChessPairToVector (5,8)
         --print $ cbx V.! 0
         --}
-        print $ buildTrajectoryBundle 1 (makeChessPiece Black King (7,3)) (5,8) obst
+        let bundle = buildTrajectoryBundle 1 (makeChessPiece Black King (6,3)) (1,1) obst
+
+        print bundle
 
         putStrLn "bye."
 

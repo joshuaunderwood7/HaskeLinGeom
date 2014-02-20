@@ -107,7 +107,7 @@ getIndexOfnonZero' table index
 getNext_jLocations table = map indexToChessLocation $ getIndexOfnonZero table
 
 buildTrajectoryBundle loopCount piece destination obsticals
-    | location piece == destination = location piece : []
+    | location piece == destination = [[location piece]]
     | loopCount >= 124 = []
     | otherwise = do
         let x = piece
@@ -117,14 +117,22 @@ buildTrajectoryBundle loopCount piece destination obsticals
         let smallRingX = smallRing obsticals x
         let bigRingX = bigRing cbx loopCount
         let ovalX = oval (sumTable cbx cby) (mapx_p cbx destination)
-        let next_j = head $ nextj_all smallRingX bigRingX ovalX
-        location piece : bJT' (loopCount + 1) (moveChessPieceUnchecked x next_j) destination obsticals cbx ovalX
+        let next_j = nextj_all smallRingX bigRingX ovalX
+        let currentList = [[location piece]]
+        bJT' currentList (loopCount + 1) piece destination obsticals cbx ovalX next_j
+bJT = buildTrajectoryBundle
 
-bJT' loopCount piece destination obsticals cbx oval
-    | location piece == destination = location piece : []
-    | loopCount >= 124 = []
+bJT' _ 124 _ _ _ _ _ _ = []
+bJT' lastList _ _ _ _ _ _ []  = lastList
+bJT' lastList loopCount piece destination obsticals cbx oval current_j
+    | location piece == destination = lastList
     | otherwise = do
-        let smallRingX = smallRing obsticals piece
+        let smallRingX = smallRing obsticals piece -- here, need to move the piece...
         let bigRingX = bigRing cbx loopCount
-        let next_j = head $ nextj_all smallRingX bigRingX oval
-        location piece : bJT' (loopCount + 1) (moveChessPieceUnchecked piece next_j) destination obsticals cbx oval
+        let next_j = nextj_all smallRingX bigRingX oval
+        let movesList = concat $ [bJT 1 (moveChessPiece piece x) destination obsticals | x <- current_j]
+        [l ++ j | j <- movesList , l <- lastList]
+
+
+
+
