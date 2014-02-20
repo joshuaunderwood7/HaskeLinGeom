@@ -99,6 +99,10 @@ locationOnChessboard (x,y)
     | x == 1 = "h" ++ (show y)
     | otherwise = "xx"
 
+trajectoryToString traj = do
+    let locats = map locationOnChessboard traj
+    concat ["a("++l++")" | l <- locats]
+
 getIndexOfnonZero table = filter (>=0) $ getIndexOfnonZero' table 0
 getIndexOfnonZero' table index
     | V.length table > index = (if table V.! index /= 0 then index else -1) : getIndexOfnonZero' table (index + 1)

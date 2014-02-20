@@ -3,6 +3,7 @@ module Main where
 import System.Environment
 import Control.Exception as EX
 import Data.Char (toUpper)
+import Data.List (nub)
 import qualified Data.Vector as V
 import Board
 import Piece
@@ -42,32 +43,10 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
     --}
     do
         let obst = [(4,7),(4,2),(5,4)]
-        {--
-        let testPieceX = makeChessPiece Black King (7,3)
-        let testPieceY = moveChessPieceUnchecked testPieceX (5,8)
-        --print $ location testPieceY
-        let cbx = appliedDistenceTable testPieceX obst
-        let cby = appliedDistenceTable testPieceY obst
-        let smallRingX = smallRing obst $ moveChessPieceUnchecked testPieceX (7,3)
-        let bigRingX = bigRing cbx 1
-        let ovalX = oval (sumTable cbx cby) (mapx_p cbx (5,8))
+        let subject = makeChessPiece Black King (6,3)
+        let bundle = buildTrajectoryBundle 1 subject (1,1) obst
 
-        displayTable "cbx" cbx
-        displayTable "cby" cby
-        displayTable "SUM table" $ sumTable cbx cby
-        displayTable "smallring" smallRingX
-        displayTable "bigRing" bigRingX
-        displayTable "oval" ovalX
-        displayTable "next_j" $ nextj_all_table smallRingX bigRingX ovalX
-        let next_j = nextj_all smallRingX bigRingX ovalX
-
-        --print $ mapx_p cbx (5,8)
-        --print $ translateChessPairToVector (5,8)
-        --print $ cbx V.! 0
-        --}
-        let bundle = buildTrajectoryBundle 1 (makeChessPiece Black King (6,3)) (1,1) obst
-
-        print bundle
+        print $ length.nub $ map trajectoryToString bundle
 
         putStrLn "bye."
 
