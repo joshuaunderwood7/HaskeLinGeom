@@ -41,17 +41,22 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
     \compiled/Distance \"Rook\" Black Rook 4 4 1 4 7 1 4 2 1 5 4 1"
     --}
     do
-        displayTable "x Rook" x
-        displayTable "cbx Rook" cbx
-        displayTable "y Rook" y
-        displayTable "cby Rook" cby
-        displayTable "oval Rook" xy
+        displayTable "x Queen" x
+        displayTable "cbx Queen" qbx
+        displayTable "y Queen" y
+        displayTable "cby Queen" qby
+        displayTable "oval Queen" qxy
         putStrLn "bye."
         where y = generateDistenceTableObst (map (\x -> (7 - (fst x) + 8, 3 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black King
               x = generateDistenceTableObst (map (\x -> (5 - (fst x) + 8, 8 - (snd x) + 8) ) [(4,7),(4,2),(5,4)]) Black King
+              xq = generateDistenceTableObst [] Black Queen
+              qbx = applyToChessBoard (6,2) xq
+              qby = applyToChessBoard (7,4) xq
               cbx = applyToChessBoard (5,8) x
               cby = applyToChessBoard (7,3) y
               xy = V.zipWith mixVectors cbx cby
+              qxy = V.zipWith mixVectors qbx qby
+              
 
 mixVectors x y
     | x < 0 = x
