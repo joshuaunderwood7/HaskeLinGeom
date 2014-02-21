@@ -103,6 +103,10 @@ trajectoryToString traj = do
     let locats = map locationOnChessboard traj
     concat ["a("++l++")" | l <- locats]
 
+trajectoryToDotString []     = ""
+trajectoryToDotString (x:[]) = ""
+trajectoryToDotString (x:xs) = "        " ++ (locationOnChessboard x) ++ " -> " ++ (locationOnChessboard (head xs)) ++ "\n" ++ trajectoryToDotString xs
+
 getIndexOfnonZero table = filter (>=0) $ getIndexOfnonZero' table 0
 getIndexOfnonZero' table index
     | V.length table > index = (if table V.! index /= 0 then index else -1) : getIndexOfnonZero' table (index + 1)
@@ -111,19 +115,23 @@ getIndexOfnonZero' table index
 getNext_jLocations table = map indexToChessLocation $ getIndexOfnonZero table
 
 buildTrajectoryBundle loopCount piece destination obsticals
-    | location piece == destination = [[location piece]]
+    | (location piece) == destination = [[location piece]]
     | loopCount >= 124 = []
     | otherwise = do
         let x = piece
-        let y = moveChessPieceUnchecked x destination
         let cbx = appliedDistenceTable x obsticals
-        let cby = appliedDistenceTable y obsticals
-        let smallRingX = smallRing obsticals x
-        let bigRingX = bigRing cbx loopCount
-        let ovalX = oval (sumTable cbx cby) (mapx_p cbx destination)
-        let next_j = nextj_all smallRingX bigRingX ovalX
-        let currentList = [[location piece]]
-        bJT' currentList (loopCount + 1) piece destination obsticals cbx ovalX next_j
+        if mapx_p cbx destination == (-1) --is destination reachable? 
+            then []
+            else do
+                let y = moveChessPieceUnchecked x destination
+                let cby = appliedDistenceTable y obsticals
+                let smallRingX = smallRing obsticals x
+                let bigRingX = bigRing cbx loopCount
+                let ovalX = oval (sumTable cbx cby) (mapx_p cbx destination)
+                let next_j = nextj_all smallRingX bigRingX ovalX
+                let currentList = [[location piece]]
+                bJT' currentList (loopCount + 1) piece destination obsticals cbx ovalX next_j
+
 bJT = buildTrajectoryBundle
 
 bJT' _ 124 _ _ _ _ _ _ = []

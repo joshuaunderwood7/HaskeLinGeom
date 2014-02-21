@@ -43,12 +43,16 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
     --}
     do
         let obst = [(4,7),(4,2),(5,4)]
-        let subject = makeChessPiece Black King (6,3)
-        let bundle = buildTrajectoryBundle 1 subject (1,1) obst
+        let s_color = Black
+        let s_rank  = Knight
+        let subject = makeChessPiece s_color s_rank (1,7)
+--        displayTable "piece Distance Table on chess board" $ appliedDistenceTable subject obst
+        let bundle = buildTrajectoryBundle 1 subject (6,2) obst
 
-        print $ length.nub $ map trajectoryToString bundle
+        --print $ length.nub $ map trajectoryToString bundle
+        mapM putStrLn $ map trajectoryToDotString bundle
 
-        putStrLn "bye."
+        putStrLn "}"
 
 
 
