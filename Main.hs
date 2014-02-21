@@ -54,6 +54,4 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
 
         putStrLn "}"
 
-
-
 main = EX.catch mainProgram showHelp
