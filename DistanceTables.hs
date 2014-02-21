@@ -3,6 +3,7 @@ module DistanceTables where
 import qualified Data.Vector as V
 import Control.Parallel.Strategies
 import Data.List (nub, transpose)
+import Data.Ix (range)
 import Piece
 import Board
 import R
@@ -117,10 +118,11 @@ getNext_jLocations table = map indexToChessLocation $ getIndexOfnonZero table
 buildTrajectoryBundle loopCount piece destination obsticals
     | (location piece) == destination = [[location piece]]
     | loopCount >= 124 = []
+    | rank piece == Pawn = bJTforP piece destination obsticals
     | otherwise = do
         let x = piece
         let cbx = appliedDistenceTable x obsticals
-        if mapx_p cbx destination == (-1) --is destination reachable? 
+        if mapx_p cbx destination < (0) --is destination reachable? 
             then []
             else do
                 let y = moveChessPieceUnchecked x destination
@@ -139,7 +141,7 @@ bJT' lastList _ _ _ _ _ _ []  = lastList
 bJT' lastList loopCount piece destination obsticals cbx oval current_j
     | location piece == destination = lastList
     | otherwise = do
-        let smallRingX = smallRing obsticals piece -- here, need to move the piece...
+        let smallRingX = smallRing obsticals piece
         let bigRingX = bigRing cbx loopCount
         let next_j = nextj_all smallRingX bigRingX oval
         let movesList = concat $ [bJT 1 (moveChessPiece piece x) destination obsticals | x <- current_j]
@@ -147,4 +149,14 @@ bJT' lastList loopCount piece destination obsticals cbx oval current_j
 
 
 
-
+bJTforP piece destination obsticals = do 
+        if mapx_p (appliedDistenceTable piece obsticals) destination < (0) --is destination unreachable?         
+        then [[]]                                                                  
+        else do
+            let yMod = snd (location piece) - snd destination
+            if yMod > 0 then do
+                let xRange  = repeat $ fst destination                              
+                [ zip xRange $ reverse [snd destination .. snd (location piece)] ]
+            else do
+                let xRange  = repeat $ fst destination                              
+                [ zip xRange $ [snd (location piece) .. snd destination] ]

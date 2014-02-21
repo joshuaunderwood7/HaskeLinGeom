@@ -42,16 +42,29 @@ showHelp _ = {--putStrLn $ "The program requires command line input.\nAlthough i
     \compiled/Distance \"Rook\" Black Rook 4 4 1 4 7 1 4 2 1 5 4 1"
     --}
     do
-        let obst = [(4,7),(4,2),(5,4)]
-        let s_color = Black
+        let obst = [] -- [(4,7),(4,2),(5,4)]
+        let s_color = White
         let s_rank  = Knight
-        let subject = makeChessPiece s_color s_rank (1,7)
---        displayTable "piece Distance Table on chess board" $ appliedDistenceTable subject obst
-        let bundle = buildTrajectoryBundle 1 subject (6,2) obst
+        let start = (1,1)
+        let destination = (1,8)
+        let subject = makeChessPiece s_color s_rank start
+
+        let x = subject
+        let piece = subject
+        let loopCount = 1
+        let obsticals = obst
+
+
+
+        let bundle = buildTrajectoryBundle 1 subject destination obst
+        
 
         --print $ length.nub $ map trajectoryToString bundle
-        mapM putStrLn $ map trajectoryToDotString bundle
+        --mapM putStrLn $ map trajectoryToDotString bundle
 
+        displayTable "White moves:" $ appliedDistenceTable x obsticals
+        print bundle
+        print $ map trajectoryToString bundle
         putStrLn "}"
 
 main = EX.catch mainProgram showHelp

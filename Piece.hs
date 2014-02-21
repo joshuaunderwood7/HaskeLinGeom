@@ -43,6 +43,11 @@ makePiece board colour rnk locat = Piece (moveFunk board colour rnk locat) colou
 makeChessPiece :: Color -> Rank -> Location -> Piece
 makeChessPiece = makePiece chessboard
 
+transColor piece 
+    | color piece == Black = makeChessPiece White (rank piece) (location piece)
+    | color piece == White = makeChessPiece Black (rank piece) (location piece)
+    | otherwise = piece
+
 makeChessDistancePiece :: Color -> Rank -> Location -> Piece
 makeChessDistancePiece = makePiece distanceBoard
 
