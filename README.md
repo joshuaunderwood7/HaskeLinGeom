@@ -22,14 +22,23 @@ I am using:
 joshua@OldnTired:~$ ghc -V
 The Glorious Glasgow Haskell Compilation System, version 7.6.3
 
+The Directed graphs require Dot and Graphviz
+
 I am also running Ubuntu 13.10.
+joshua@OldnTired:~$ dot -V
+dot - graphviz version 2.26.3 (20100126.1600)
+
 
 to install the haskell platform I ran
 joshua@OldnTired:~$ sudo apt-get install haskell-platform
 
+to install the dot and graphviz I ran
+joshua@OldnTired:~$ sudo apt-get install graphviz
+
 (this will bring in most of the core libraries,
 runghc (which is an interpreter), ghci (the REPL),
-and ghc (the compiler) )
+and ghc (the compiler). Graphviz is needed to generate
+the directed graph images. )
 
 Ubuntu comes with make.
 
