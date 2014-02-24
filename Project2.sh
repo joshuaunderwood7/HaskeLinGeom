@@ -1,12 +1,14 @@
+#!/bin/bash
+
 #make the project
 make
 
 #all obsicals are at c3, d3:6, e3:6, f4:5
-OBST = " 6 3 0 5 3 1 5 4 1 5 5 1 5 6 1 4 3 1 4 4 1 4 5 1 4 6 1 3 4 1 3 5 1 "
-STARTA = " 3 2 1 "
-STARTB = " 6 4 1 "
-ENDA = " 3 6 1 "
-ENDB = "6 6 1 "
+OBST=" 6 3 0 5 3 1 5 4 1 5 5 1 5 6 1 4 3 1 4 4 1 4 5 1 4 6 1 3 4 1 3 5 1 "
+STARTA=" 3 2 1 "
+STARTB=" 6 4 1 "
+ENDA=" 3 6 1 "
+ENDB="6 6 1 "
 
 #draw the graphs
 #king from f3 -> f6
@@ -27,7 +29,7 @@ rm rook.dot
 dot -Kfdp -n -Tpng -o rook.png ./rook.dot
 
 rm queen.dot
-./compiled/Distance ACCEPTABLEBUNDLE \"\" Black Queen $STARTA $ENDA 3 $OBST>> queen.dot
+./compiled/Distance ACCEPTABLEBUNDLE \"\" Black Queen $STARTB $ENDB 2 $OBST>> queen.dot
 dot -Kfdp -n -Tpng -o queen.png ./queen.dot
 
 rm pawn.dot

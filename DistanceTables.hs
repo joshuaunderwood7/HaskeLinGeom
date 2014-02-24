@@ -113,7 +113,15 @@ getIndexOfnonZero' table index
     | V.length table > index = (if table V.! index /= 0 then index else -1) : getIndexOfnonZero' table (index + 1)
     | otherwise              = []
 
+getIndexOfNLength table nLength = filter (>=0) $ getIndexOfNLength' nLength table 0
+getIndexOfNLength' n table index
+    | V.length table > index = (if table V.! index == n then index else -1) : getIndexOfNLength' n table (index + 1)
+    | otherwise              = []
+
+getNLengthLocations table n = map indexToChessLocation $ getIndexOfNLength table n
+
 getNext_jLocations table = map indexToChessLocation $ getIndexOfnonZero table
+
 
 buildTrajectoryBundle loopCount piece destination obsticals
     | (location piece) == destination = [[location piece]]
@@ -148,7 +156,7 @@ bJT' lastList loopCount piece destination obsticals cbx oval current_j
         [l ++ j | j <- movesList , l <- lastList]
 
 
-
+--TODO: Why doesn't bJT' work for pawns?  Need to look into this.
 bJTforP piece destination obsticals = do 
         if mapx_p (appliedDistenceTable piece obsticals) destination < (0) --is destination unreachable?         
         then [[]]                                                                  
@@ -160,3 +168,41 @@ bJTforP piece destination obsticals = do
             else do
                 let xRange  = repeat $ fst destination                              
                 [ zip xRange $ [snd (location piece) .. snd destination] ]
+
+builtAcceptableTrajectoriesBundle loopCount piece destination obsticals maxLength = do
+    let x = piece
+    let cbx = appliedDistenceTable x obsticals
+    let y = moveChessPieceUnchecked x destination
+    let cby = appliedDistenceTable y obsticals
+    let distanceSum = sumTable cbx cby
+    let minDistence = V.minimum distanceSum
+    let maxDistence = V.maximum distanceSum
+    bAJT' loopCount piece destination obsticals maxLength x y cbx cby distanceSum minDistence maxDistence 
+bAJT = builtAcceptableTrajectoriesBundle
+bAJT' loopCount piece destination obsticals maxLength x y cbx cby distanceSum minDistence maxDistence
+    | maxLength < minDistence = [[]]
+    | maxLength == minDistence = bJT loopCount piece destination obsticals
+    | maxLength > maxDistence = bAJT' loopCount piece destination obsticals maxDistence x y cbx cby distanceSum minDistence maxDistence
+    | otherwise = do
+        let acceptableLengths = drop 1 [minDistence .. maxLength] 
+        let acceptableMidpoints = filter (\x -> x /= (location piece) && x /= destination) $ concat [getNLengthLocations distanceSum n | n <- acceptableLengths]
+        let midPointBundles = concat [combineBundles piece midPoint destination obsticals | midPoint <- acceptableMidpoints]
+        let shortestBundles = bJT 1 piece destination obsticals
+        shortestBundles ++ midPointBundles
+
+combineBundles piece midPoint destination obsticals = do
+    let bundleToMidpoint   = bJT 1 piece midPoint obsticals
+    let bundleFromMidpoint = map (drop 1) $ bJT 1 (moveChessPieceUnchecked piece midPoint) destination obsticals
+    [i ++ j | i <- bundleToMidpoint, j <- bundleFromMidpoint]
+
+
+
+
+
+
+
+
+
+
+
+
