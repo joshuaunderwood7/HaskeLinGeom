@@ -27,6 +27,7 @@ r_r :: (Num a, Num a1, Ord a, Ord a1) => (a, a1) -> (a, a1) -> Bool
 r_q :: (Num a, Ord a) => (a, a) -> (a, a) -> Bool
 r_q' :: (Num a, Ord a) => (a, a) -> (a, a) -> Bool
 r_k :: (Num a, Num a1, Ord a, Ord a1) => (a, a1) -> (a, a1) -> Bool
+r_u :: (Num a, Num a1, Ord a, Ord a1) => (a, a1) -> (a, a1) -> Bool
 
 --pawns are diffucult and this is not corrct
 r_pB x@(x1, x2) y@(y1, y2) = or [ and [ x1 == y1, (x2 - y2) == -1],
@@ -55,4 +56,7 @@ r_q x@(x1, x2) y@(y1, y2) = and [(abs (x1 - y1)) <= 8,
 r_q' x@(x1, x2) y@(y1, y2) = or [r_r x y, r_b x y] 
 
 r_k x@(x1, x2) y@(y1, y2) = and [(abs (x1 - y1)) <= 1, (abs (x2- y2)) <= 1]
+
+r_u x@(x1, x2) y@(y1, y2) = or [and [(abs (x1 - y1)) == 1, (abs (x2 - y2)) <= 1],
+                                and [(abs (x1 - y1)) == 2, (abs (x2 - y2)) == 0]]
 

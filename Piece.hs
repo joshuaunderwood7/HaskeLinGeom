@@ -14,16 +14,17 @@ getColorFromString x
     | (map toUpper x) == "BLACK" = Black
     | otherwise = Grey
 
-data Rank = Pawn | Knight | Bishop | Rook | Queen | King | Obstacle
+data Rank = Pawn | Knight | Bishop | Rook | Queen | King | Obstacle | Underwood
     deriving (Eq, Show)
 
 getRankFromString x
-    | (map toUpper x) == "PAWN"   = Pawn
-    | (map toUpper x) == "KNIGHT" = Knight
-    | (map toUpper x) == "BISHOP" = Bishop
-    | (map toUpper x) == "ROOK"   = Rook
-    | (map toUpper x) == "QUEEN"  = Queen
-    | (map toUpper x) == "KING"   = King
+    | (map toUpper x) == "PAWN"      = Pawn
+    | (map toUpper x) == "KNIGHT"    = Knight
+    | (map toUpper x) == "BISHOP"    = Bishop
+    | (map toUpper x) == "ROOK"      = Rook
+    | (map toUpper x) == "QUEEN"     = Queen
+    | (map toUpper x) == "KING"      = King
+    | (map toUpper x) == "UNDERWOOD" = Underwood
     | otherwise  = Obstacle
 
 data Piece = Piece { movement :: (Location -> Bool) ,
@@ -60,6 +61,7 @@ moveFunk board colour rnk locat
     | rnk == Rook   = (r board) r_r locat
     | rnk == Queen  = (r board) r_q locat
     | rnk == King   = (r board) r_k locat
+    | rnk == Underwood = (r board) r_u locat
     | otherwise     = \_ -> False
 
 --needs to include more than the movment check, needs to remove oposing piece
@@ -109,6 +111,7 @@ advancedBoardMovments table piece
                           ++ (filterObst [x | x <- (upRight (location piece))]) ++ (filterObst [x | x <- (downRight (location piece))])
     | (rank piece) == Knight = filterObstKnight $ genaricBoardMovments distanceBoard piece
     | (rank piece) == King   = genaricBoardMovments distanceBoard piece
+    | (rank piece) == Underwood = genaricBoardMovments distanceBoard piece
     | otherwise = [(location piece)]
     where filterObst = takeWhile (\m -> (movement piece m) && table V.! (translatePairToVector m) /= (-2))
           filterObstKnight = filter (\m -> (movement piece m) && table V.! (translatePairToVector m) /= (-2))

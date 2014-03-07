@@ -95,13 +95,13 @@ showHelp _ = do
     \./compiled/Distance ACCEPTABLEBUNDLE \"King\" Black King 3 3 1 3 6 1 4 4 3 1 4 4 1 4 5 1 4 6 1 3 4 1 3 5 1 \n\
     \ \n" 
     
-    --}
+    {--
     do
         let obst = [(4,3),(4,4),(4,5),(4,6),(5,3),(5,4),(5,5),(5,6),(6,3),(3,4),(3,5)]
         let s_color = White
-        let s_rank  = Rook
-        let start = (3,3)
-        let destination = (3,6)
+        let s_rank  = Underwood
+        let start = (3,2)
+        let destination = (4,1)
         let subject = makeChessPiece s_color s_rank start
 
 
@@ -115,7 +115,7 @@ showHelp _ = do
 
         --displayTable "White moves:" $ appliedDistenceTable x obsticals
         --print $ map trajectoryToString bundle
-        putStrLn "}"
+        displayTable "Underwood moves:" $ appliedDistenceTable subject []
     --}
 
 generateDotFile filename bundle obsticals = writeFile filename (generateDotString bundle obsticals)
@@ -123,9 +123,9 @@ generateDotString bundle obsticals = do
     let header = "digraph {"
     let nodes = [ (x,y) | x <- [8, 7..1] , y <- [1..8] ]
     let nodeStrings = map (makeNodeString obsticals) nodes
-    let trajectoryStrings = map trajectoryToDotString bundle
+    let trajectoryStrings = (unlines.nub.lines.concat) $ map trajectoryToDotString bundle
     let footer = "}"
-    header ++ (foldr1 (++) nodeStrings) ++ (foldr1 (++) trajectoryStrings) ++ footer
+    header ++ (foldr1 (++) nodeStrings) ++ trajectoryStrings ++ footer
 
 makeNodeString obsticals node@(x,y)
     | node `elem` obsticals = ""
