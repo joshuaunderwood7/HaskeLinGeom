@@ -79,6 +79,10 @@ acceptableBundleIO args = do
     let bundle = builtAcceptableTrajectoriesBundle 1 piece destination obst maxLength
     putStrLn $ generateDotString bundle obst
 
+
+
+
+
 showHelp :: SomeException -> IO ()
 showHelp _ = putStrLn $ "The program requires command line input.\nAlthough it is assumed \
     \that the board is 8x8x1 for now. Try entering this: \n\

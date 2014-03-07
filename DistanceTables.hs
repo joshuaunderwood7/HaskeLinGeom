@@ -195,14 +195,3 @@ combineBundles piece midPoint destination obsticals = do
     let bundleFromMidpoint = map (drop 1) $ bJT 1 (moveChessPieceUnchecked piece midPoint) destination obsticals
     [i ++ j | i <- bundleToMidpoint, j <- bundleFromMidpoint]
 
-
-
-
-
-
-
-
-
-
-
-
