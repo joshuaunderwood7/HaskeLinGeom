@@ -5,3 +5,9 @@ cabal-dev
 *.chi
 *.chs.h
 .virthualenv
+*.png
+*.tar
+*.gz
+*.xcf
+*.orig
+

@@ -32,11 +32,28 @@ data Piece = Piece { movement :: (Location -> Bool) ,
                      rank     :: Rank ,
                      location :: Location }
 
+instance Show Piece where
+    show x = do
+        let col = (show $ color x) 
+        let rnk = (show $ rank x)
+        let posx = (show $ fst $ location x)
+        let posy = (show $ snd $ location x)
+        col ++ " " ++ rnk ++ " (" ++ posx ++ ", " ++ posy ++ ")"
+
+instance Eq Piece where
+    (==) x y = and [ (color x) == (color y),
+                     (rank x) == (rank y),
+                     (fst $ location x) == (fst $ location y),
+                     (snd $ location x) == (snd $ location y)]
+                    
+
 on :: Location -> [Piece] -> [Piece]
 on x ps = [p | p <- ps, (location p) == x]
 
 on1 :: Location -> [Piece] -> Piece
 on1 x ps = head $ on x ps
+
+oppose p1 p2 = (color p1) /= (color p2)
 
 makePiece :: Board -> Color -> Rank -> Location -> Piece
 makePiece board colour rnk locat = Piece (moveFunk board colour rnk locat) colour rnk locat

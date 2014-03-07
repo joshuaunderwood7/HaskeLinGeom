@@ -27,6 +27,8 @@ mainProgram = do
         "CHESSDISTANCE"    -> displayChessTableIO $ drop 1 args
         "BUNDLE"           -> bundleIO $ drop 1 args
         "ACCEPTABLEBUNDLE" -> acceptableBundleIO $ drop 1 args
+        "BUNDLESTRING"           -> bundleIOString $ drop 1 args
+        "ACCEPTABLEBUNDLESTRING" -> acceptableBundleIOString $ drop 1 args
 
 
 
@@ -79,7 +81,33 @@ acceptableBundleIO args = do
     let bundle = builtAcceptableTrajectoriesBundle 1 piece destination obst maxLength
     putStrLn $ generateDotString bundle obst
 
+bundleIOString args = do
+    let filename = head args
+    let colour = head  $ drop 1 args
+    let rnk = head $ drop 2 args
+    let obst = strToLocation $ drop 9 args
+    let locat = (read (head (drop 3 args)) :: Int , read (head (drop 4 args)) :: Int )
+    let destination = (read (head (drop 6 args)) :: Int , read (head (drop 7 args)) :: Int )
+    let piece = makeChessPiece (getColorFromString colour) (getRankFromString rnk) locat
 
+    let bundle = buildTrajectoryBundle 1 piece destination obst
+    mapM putStrLn $ nub $ map trajectoryToString bundle
+    return ()
+
+
+acceptableBundleIOString args = do
+    let filename = head args
+    let colour = head  $ drop 1 args
+    let rnk = head $ drop 2 args
+    let obst = strToLocation $ drop 10 args
+    let locat = (read (head (drop 3 args)) :: Int , read (head (drop 4 args)) :: Int )
+    let destination = (read (head (drop 6 args)) :: Int , read (head (drop 7 args)) :: Int )
+    let maxLength = read ( head ( drop 9 args ) ) :: Integer
+    let piece = makeChessPiece (getColorFromString colour) (getRankFromString rnk) locat
+
+    let bundle = builtAcceptableTrajectoriesBundle 1 piece destination obst maxLength
+    mapM putStrLn $ nub $ map trajectoryToString bundle
+    return ()
 
 
 
@@ -93,8 +121,11 @@ showHelp _ = do
     \./compiled/Distance BUNDLE \"King\" Black King 3 3 1 3 6 1 4 3 1 4 4 1 4 5 1 4 6 1 3 4 1 3 5 1 \n\
     \or \n\
     \./compiled/Distance ACCEPTABLEBUNDLE \"King\" Black King 3 3 1 3 6 1 4 4 3 1 4 4 1 4 5 1 4 6 1 3 4 1 3 5 1 \n\
-    \ \n" 
-    
+    \or \n\
+    \./compiled/Distance BUNDLESTRING \"King\" Black King 3 3 1 3 6 1 4 3 1 4 4 1 4 5 1 4 6 1 3 4 1 3 5 1 \n\
+    \or \n\
+    \./compiled/Distance ACCEPTABLEBUNDLESTRING \"King\" Black King 3 3 1 3 6 1 4 4 3 1 4 4 1 4 5 1 4 6 1 3 4 1 3 5 1 \n\
+    \ \n"
     {--
     do
         let obst = [(4,3),(4,4),(4,5),(4,6),(5,3),(5,4),(5,5),(5,6),(6,3),(3,4),(3,5)]
