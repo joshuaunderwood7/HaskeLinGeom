@@ -84,7 +84,8 @@ acceptableBundleIO args = do
 
 
 showHelp :: SomeException -> IO ()
-showHelp _ = putStrLn $ "The program requires command line input.\nAlthough it is assumed \
+showHelp _ = do
+    putStrLn $ "The program requires command line input.\nAlthough it is assumed \
     \that the board is 8x8x1 for now. Try entering this: \n\
     \\n \
     \./compiled/Distance DISTANCE \"Rook\" Black Rook 4 4 1 4 7 1 4 2 1 5 4 1 \n\
@@ -95,11 +96,10 @@ showHelp _ = putStrLn $ "The program requires command line input.\nAlthough it i
     \ \n" 
     
     --}
-    {--
     do
         let obst = [(4,3),(4,4),(4,5),(4,6),(5,3),(5,4),(5,5),(5,6),(6,3),(3,4),(3,5)]
         let s_color = White
-        let s_rank  = King
+        let s_rank  = Rook
         let start = (3,3)
         let destination = (3,6)
         let subject = makeChessPiece s_color s_rank start
@@ -110,8 +110,8 @@ showHelp _ = putStrLn $ "The program requires command line input.\nAlthough it i
         
 
         --print $ length.nub $ map trajectoryToString bundle
-        mapM putStrLn $ map (\x -> "        " ++ locationOnChessboard x ++ " [fillcolor=yellow]") obst  
-        mapM putStrLn $ map trajectoryToDotString bundle
+        --mapM putStrLn $ map (\x -> "        " ++ locationOnChessboard x ++ " [fillcolor=yellow]") obst  
+        putStrLn $ (unlines.nub.lines.concat) $ map trajectoryToDotString bundle
 
         --displayTable "White moves:" $ appliedDistenceTable x obsticals
         --print $ map trajectoryToString bundle
