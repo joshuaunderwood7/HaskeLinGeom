@@ -9,6 +9,10 @@ import qualified Data.Vector as V
 frst (x,_,_) = x
 scnd (_,x,_) = x
 thrd (_,_,x) = x
+easierU :: U -> (Integer, Integer, Integer)
+easierU bigU = ( toInteger $ translateChessPairToVector $ frst bigU,
+                 toInteger $ translateChessPairToVector $ scnd bigU,
+                 thrd bigU )
 
 type U = (Location, Location, Integer)
 type V = V.Vector Integer
@@ -28,6 +32,7 @@ data GrammarState = GrammarState {
         gs_w :: W,
         gs_time :: TIME,
         gs_nexttime :: NEXTTIME }
+
 
 initilizeGrammar pieces p0 x0 y0 l0 n = do
     let u0 = (x0, y0, l0)
@@ -77,8 +82,92 @@ q4 gs = do
 q5 gs = or $ V.toList $ V.map (/=0) (gs_w gs)
 q6 _ = True
 
+gzinit gs u r
+    | u == (0,0,0) = 2 * (gs_n gs)
+    | otherwise   = r
+
+gzf gs u@(x,y,l) v 
+    | or [(and [(x/=(gs_n gs)),(l>(toInteger 0))]),(and [(y==(gs_n gs)),(l<=(toInteger 0))])] = (x+(toInteger 1),y,l)
+    | or [(x==(gs_n gs)),(and [(y/=(gs_n gs)),(l<=(toInteger 0))])] = ( (toInteger 1), 
+                                                                        (y+(toInteger 1)), 
+                                                                        ((gs_time gs)V.! fromInteger (y+(toInteger 1))) * (v V.! fromInteger (y+(toInteger 1))) )
+    | otherwise = u
+
 h_i gs = True
+
+generateChessZoneM2 pieces mainPiece target mainTrajectory = do
+    let obstPices = (filter (/= mainPiece) pieces) 
+    print obstPices
+    let otherPices = (filter (\x -> x /= target && x /= mainPiece) pieces) 
+    print otherPices
+    let actualMainTrajectory = tail mainTrajectory
+    let gzTIMEbase = V.map (+1) $ appliedDistenceTable mainPiece (map location otherPices) 
+    putStr "gzTIMEbase: "
+    print gzTIMEbase
+    let gzTrajBase = V.update emptyChessTable $ V.fromList $ zip [0..63] (repeat 0)
+    let gzTrajr    = V.update gzTrajBase $ V.fromList $ zip (map translateChessPairToVector actualMainTrajectory) (repeat 1)
+    let gzTraj     = {--V.fromList.reverse.V.toList $--} gzTrajr
+    putStr "gzTraj:     "
+    print gzTraj
+    let gzTIME     = V.fromList $ zipWith (*) [x | x <- (V.toList gzTraj)] [y | y <- (V.toList gzTIMEbase)]
+    putStr "gzTIME:     " -- The error is up here /\
+    displayTable "gzTIME" gzTIME
+    print $ zipWith (*) [x | x <- (V.toList gzTraj)] [y | y <- (V.toList gzTIMEbase)]
+    let primeTraj  = (mainPiece, mainTrajectory, (gzTIME V.! (translateChessPairToVector (last mainTrajectory))))
+    let baseResult = primeTraj : [makeNetworkTraj (color mainPiece) piece dest obstPices (gzTIME V.! (translateChessPairToVector dest)) | piece <- otherPices, dest <- actualMainTrajectory]
+    return $ filter (\x-> (length.scnd) x <= ((+1).fromInteger.thrd) x) $ filter (\x -> scnd x /= []) baseResult
+    
+makeNetworkTraj mColor piece dest obstPieces maxLength  
+    | mColor == color piece = (piece, [], -1)
+    | otherwise = do
+        let bundle = buildTrajectoryBundle 1 piece dest (map location obstPieces)
+        if bundle == [] then (piece, [], -1)
+                        else (piece, head bundle, maxLength)
+    
+main = do
+    let s_color = White
+    let s_rank  = King
+    let start = (1,1)
+    let destination = (4,1)
+    let subject = makeChessPiece s_color s_rank start
+    let i_color = Black
+    let i_rank  = Queen
+    let i_start = (5,8)
+    let i_dest  = (2,1)
+    let i_adversary = makeChessPiece i_color i_rank i_start
+    let l_color = Black
+    let l_rank  = Knight
+    let l_start = (5,6)
+    let l_dest  = (2,1)
+    let l_adversary = makeChessPiece l_color l_rank l_start
+    let t_color = Black
+    let t_rank  = Rook
+    let t_start = (4,1)
+    let t_dest  = (4,1)
+    let target = makeChessPiece t_color t_rank t_start
+    let pieces = [subject, i_adversary, l_adversary, target]
+
+    let mainTrajectory = head $ buildTrajectoryBundle 1 subject destination [(location i_adversary), (location l_adversary)]
+    print mainTrajectory
+
+    let zone = generateChessZoneM2 pieces subject target mainTrajectory 
+    zone >>= print
+
+    --let obst = [(4,3),(4,4),(4,5),(4,6),(5,3),(5,4),(5,5),(5,6),(6,3),(3,4),(3,5)]
+
+
+    --let bundle = buildTrajectoryBundle 1 subject destination obst
+    --let bundle = bAJT 1 subject destination obst 4
     
 
-main = do
+    --print $ length.nub $ map trajectoryToString bundle
+    --mapM putStrLn $ map (\x -> "        " ++ locationOnChessboard x ++ " [fillcolor=yellow]") obst  
+    --putStrLn $ (unlines.nub.lines.concat) $ map trajectoryToDotString bundle
+
+    --displayTable "White moves:" $ appliedDistenceTable x obsticals
+    --print $ map trajectoryToString bundle
+    --displayTable "Underwood moves:" $ appliedDistenceTable subject []
+    --let mainPiece = makeChessPiece
+    --print $ zone
+
     print "bye"

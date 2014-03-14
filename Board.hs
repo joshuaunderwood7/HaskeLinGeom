@@ -45,9 +45,11 @@ doubleMinus1 (Just x) = Just ((x*2)-1)
 --board functions---
 --
 
---emptyTable board = V.replicate (numberOfSquares2d $ makeDistanceBoard board) (-1)
 emptyTable :: V.Vector Integer
 emptyTable = V.replicate (numberOfSquares2d distanceBoard) (-1)
+--emptyTable board = V.replicate (numberOfSquares2d $ makeDistanceBoard board) (-1)
+emptyChessTable :: V.Vector Integer
+emptyChessTable = V.replicate (numberOfSquares2d chessboard) (-1)
 
 placeObst :: V.Vector Integer -> [Location] -> V.Vector Integer
 placeObst table []     = table
