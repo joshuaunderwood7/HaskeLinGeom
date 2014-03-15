@@ -35,7 +35,7 @@ main = do
     print mainTrajectory
 
     let zone = generateChessZoneM2 pieces subject target mainTrajectory 
-    zone >>= print
+    zone >>= return.zoneToString >>= putStrLn
 
     --let obst = [(4,3),(4,4),(4,5),(4,6),(5,3),(5,4),(5,5),(5,6),(6,3),(3,4),(3,5)]
 

@@ -33,6 +33,10 @@ data GrammarState = GrammarState {
         gs_time :: TIME,
         gs_nexttime :: NEXTTIME }
 
+zoneToString zone = do
+    let zone'  = map (\(a,b,c) -> "t(" ++ show a ++ ", " ++ trajectoryToString b ++", " ++ show c ++ ")") zone
+    unlines zone'
+
 
 initilizeGrammar pieces p0 x0 y0 l0 n = do
     let u0 = (x0, y0, l0)
