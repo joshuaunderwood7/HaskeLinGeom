@@ -100,8 +100,6 @@ gzf gs u@(x,y,l) v
 h_i gs = True
 
 generateChessZoneM2 pieces mainPiece target mainTrajectory = do
-    let obstPices = (filter (/= mainPiece) pieces) 
-    print obstPices
     let otherPices = (filter (\x -> x /= target && x /= mainPiece) pieces) 
     print otherPices
     let actualMainTrajectory = tail mainTrajectory
@@ -114,11 +112,10 @@ generateChessZoneM2 pieces mainPiece target mainTrajectory = do
     putStr "gzTraj:     "
     print gzTraj
     let gzTIME     = V.fromList $ zipWith (*) [x | x <- (V.toList gzTraj)] [y | y <- (V.toList gzTIMEbase)]
-    putStr "gzTIME:     " -- The error is up here /\
+    putStr "gzTIME:     "
     displayTable "gzTIME" gzTIME
-    print $ zipWith (*) [x | x <- (V.toList gzTraj)] [y | y <- (V.toList gzTIMEbase)]
     let primeTraj  = (mainPiece, mainTrajectory, (gzTIME V.! (translateChessPairToVector (last mainTrajectory))))
-    let baseResult = primeTraj : [makeNetworkTraj (color mainPiece) piece dest obstPices (gzTIME V.! (translateChessPairToVector dest)) | piece <- otherPices, dest <- actualMainTrajectory]
+    let baseResult = primeTraj : [makeNetworkTraj (color mainPiece) piece dest otherPices (gzTIME V.! (translateChessPairToVector dest)) | piece <- otherPices, dest <- actualMainTrajectory]
     return $ filter (\x-> (length.scnd) x <= ((+1).fromInteger.thrd) x) $ filter (\x -> scnd x /= []) baseResult
     
 makeNetworkTraj mColor piece dest obstPieces maxLength  

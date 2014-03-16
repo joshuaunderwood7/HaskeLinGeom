@@ -1,18 +1,15 @@
 HaskeLinGeom
 ============
 
-A Linguistic Geometry Distance Table application written in Haskell
+1) ./compiled/GrammarOfZones 
 
-For this assignment, I have not completed the 3d board or the board
-locations input.
+This is an impilentation for zone generation.
 
-I apologize for the crazy moon language.
-I intended to do this assignment (and future assignments) in python,
-but when running this program it took about 5 seconds to run the python
-program and .014s to run the Haskell program.
+At thee moment it only will compute first negations.
 
-So I intend to use the Haskell program to generate the tables, and use python to
-do the other less time consuming pieces. I hope.
+2) ./compiled/Distance
+
+This program will generate trajectory bundles and create Distance tables
 
 
 How to run
@@ -23,6 +20,7 @@ joshua@OldnTired:~$ ghc -V
 The Glorious Glasgow Haskell Compilation System, version 7.6.3
 
 The Directed graphs require Dot and Graphviz
+Also display is used to show .png files.
 
 I am also running Ubuntu 13.10.
 joshua@OldnTired:~$ dot -V
@@ -40,7 +38,7 @@ runghc (which is an interpreter), ghci (the REPL),
 and ghc (the compiler). Graphviz is needed to generate
 the directed graph images. )
 
-Ubuntu comes with make.
+Ubuntu comes with make and display.
 
 so from the command line simply un-tar the file and
 run make and it should produce ./compiled/Distance
@@ -52,6 +50,21 @@ or may not run on another system.
 
 How this works is:
 ------------------
+
+The newest edition is the Network Generation.
+
+from the command line run
+
+user@system:~$ ./compiled/GrammarOfZones
+
+The output will be TIME table for the main trajectory and a set of trajectories
+that represent the network.
+
+Each trajectory is printed on it's own line for clarity, but know that they are
+only printed this way to be easier to read.
+
+These networks only have first negations right now. second negations coming.
+
 
 from the command line run
 
