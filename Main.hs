@@ -17,8 +17,6 @@ strToLocation str = do
     let y = read ( head (drop 1 str) ) :: Int
     (x, y) : strToLocation (drop 3 str)
 
--- runghc Main.hs "Queen" Black Queen 8 8 1 4 4 1 8 1 1 3 2 1
----main :: String -> Color -> Rank -> Int Int Int-> [Int Int Int] -> DistanceTable
 
 mainProgram = do
     args <- getArgs

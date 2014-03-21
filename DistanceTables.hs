@@ -182,16 +182,17 @@ bAJT = builtAcceptableTrajectoriesBundle
 bAJT' loopCount piece destination obsticals maxLength x y cbx cby distanceSum minDistence maxDistence
     | maxLength < minDistence = [[]]
     | maxLength == minDistence = bJT loopCount piece destination obsticals
-    | maxLength > maxDistence = bAJT' loopCount piece destination obsticals maxDistence x y cbx cby distanceSum minDistence maxDistence
+--    | maxLength > maxDistence = bAJT' loopCount piece destination obsticals maxDistence x y cbx cby distanceSum minDistence maxDistence
     | otherwise = do
         let acceptableLengths = drop 1 [minDistence .. maxLength] 
         let acceptableMidpoints = filter (\x -> x /= (location piece) && x /= destination) $ concat [getNLengthLocations distanceSum n | n <- acceptableLengths]
         let midPointBundles = concat [combineBundles piece midPoint destination obsticals | midPoint <- acceptableMidpoints]
         let shortestBundles = bJT 1 piece destination obsticals
-        shortestBundles ++ midPointBundles
+        filter (verifyDestination destination) (shortestBundles ++ midPointBundles)
 
 combineBundles piece midPoint destination obsticals = do
-    let bundleToMidpoint   = bJT 1 piece midPoint obsticals
-    let bundleFromMidpoint = map (drop 1) $ bJT 1 (moveChessPieceUnchecked piece midPoint) destination obsticals
+    let bundleToMidpoint   = map init $ filter (verifyDestination midPoint) $ bJT 1 piece midPoint obsticals
+    let bundleFromMidpoint = filter (verifyDestination destination) $ bJT 1 (moveChessPieceUnchecked piece midPoint) destination obsticals
     [i ++ j | i <- bundleToMidpoint, j <- bundleFromMidpoint]
 
+verifyDestination destination x = (last x) == destination
