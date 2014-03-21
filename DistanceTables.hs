@@ -153,8 +153,8 @@ bJT' lastList loopCount piece destination obsticals cbx oval current_j
         let bigRingX = bigRing cbx loopCount
         let next_j = nextj_all smallRingX bigRingX oval
         let movesList = concat $ [bJT 1 (moveChessPiece piece x) destination obsticals | x <- current_j]
-        [l ++ j | j <- movesList , l <- lastList]
-
+        let finalBundles = [l ++ j | j <- movesList , l <- lastList]
+        filter (verifyDestination destination) finalBundles
 
 --TODO: Why doesn't bJT' work for pawns?  Need to look into this.
 bJTforP piece destination obsticals = do 
@@ -188,11 +188,14 @@ bAJT' loopCount piece destination obsticals maxLength x y cbx cby distanceSum mi
         let acceptableMidpoints = filter (\x -> x /= (location piece) && x /= destination) $ concat [getNLengthLocations distanceSum n | n <- acceptableLengths]
         let midPointBundles = concat [combineBundles piece midPoint destination obsticals | midPoint <- acceptableMidpoints]
         let shortestBundles = bJT 1 piece destination obsticals
-        filter (verifyDestination destination) (shortestBundles ++ midPointBundles)
+        let finalBundles = shortestBundles ++ midPointBundles
+        filter (verifyDestination destination) finalBundles
 
 combineBundles piece midPoint destination obsticals = do
     let bundleToMidpoint   = map init $ filter (verifyDestination midPoint) $ bJT 1 piece midPoint obsticals
     let bundleFromMidpoint = filter (verifyDestination destination) $ bJT 1 (moveChessPieceUnchecked piece midPoint) destination obsticals
     [i ++ j | i <- bundleToMidpoint, j <- bundleFromMidpoint]
 
-verifyDestination destination x = (last x) == destination
+verifyDestination destination [] = False
+verifyDestination destination x  = (last x) == destination
+

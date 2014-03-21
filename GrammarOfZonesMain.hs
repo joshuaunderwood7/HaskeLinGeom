@@ -36,4 +36,5 @@ main = do
     let zone2 = generateChessZoneM2 pieces2 (head pieces2) (head $ drop 1 pieces2) [(1,5),(1,4),(1,3),(1,2),(1,1)]
     zone2 >>= return.zoneToString >>= putStrLn
 
+
     print "bye"

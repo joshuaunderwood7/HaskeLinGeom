@@ -101,27 +101,30 @@ h_i gs = True
 
 generateChessZoneM2 pieces mainPiece target mainTrajectory = do
     let otherPices = (filter (\x -> x /= target && x /= mainPiece) pieces) 
-    print otherPices
     let actualMainTrajectory = tail mainTrajectory
     let gzTIMEbase = V.map (+1) $ appliedDistenceTable mainPiece (map location otherPices) 
-    putStr "gzTIMEbase: "
     print gzTIMEbase
-    let gzTrajBase = V.update emptyChessTable $ V.fromList $ zip [0..63] (repeat 0)
-    let gzTrajr    = V.update gzTrajBase $ V.fromList $ zip (map translateChessPairToVector actualMainTrajectory) (repeat 1)
-    let gzTraj     = {--V.fromList.reverse.V.toList $--} gzTrajr
-    putStr "gzTraj:     "
-    print gzTraj
+    let gzTrajBase = V.fromList $ take 64 $ repeat 0
+    let gzTraj     = V.update gzTrajBase $ V.fromList $ zip (map translateChessPairToVector actualMainTrajectory) (repeat 1)
     let gzTIME     = V.fromList $ zipWith (*) [x | x <- (V.toList gzTraj)] [y | y <- (V.toList gzTIMEbase)]
-    putStr "gzTIME:     "
+
+    displayTable "mainDistance" $ appliedDistenceTable mainPiece (map location otherPices)
     displayTable "gzTIME" gzTIME
+
     let primeTraj  = (mainPiece, mainTrajectory, (gzTIME V.! (translateChessPairToVector (last mainTrajectory))))
     let baseResult = primeTraj : [makeNetworkTraj (color mainPiece) piece dest otherPices (gzTIME V.! (translateChessPairToVector dest)) | piece <- otherPices, dest <- actualMainTrajectory]
     return $ filter (\x-> (length.scnd) x <= ((+1).fromInteger.thrd) x) $ filter (\x -> scnd x /= []) baseResult
     
 makeNetworkTraj mColor piece dest obstPieces maxLength  
-    | mColor == color piece = (piece, [], -1)
+    | mColor == color piece = do
+        let bundle = bJT 1 piece dest (map location obstPieces)
+        --let bundlebase = bJT 1 piece dest (map location obstPieces)
+        --let bundle = filter (\x-> length x == 2) $ filter (\x -> x /= []) bundlebase 
+            --not needed, but I feel like it's a good idea to filter here in
+            --case generateChessZoneM2 changes it's filtering
+        if bundle == [] then (piece, [], -1)
+                        else (piece, head bundle, 1)
     | otherwise = do
-        let bundle = buildTrajectoryBundle 1 piece dest (map location obstPieces)
+        let bundle = bAJT 1 piece dest (map location obstPieces) maxLength
         if bundle == [] then (piece, [], -1)
                         else (piece, head bundle, maxLength)
-    
