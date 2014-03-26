@@ -9,6 +9,64 @@ import qualified Data.Vector as V
 frst (x,_,_) = x
 scnd (_,x,_) = x
 thrd (_,_,x) = x
+
+
+generateChessZoneM2 _ mainPiece _ [] = return [(mainPiece, [location mainPiece], 1)]
+generateChessZoneM2 pieces mainPiece target mainTrajectory = do
+    let otherPices = (filter (\x -> x /= target && x /= mainPiece) pieces) 
+    let actualMainTrajectory = tail mainTrajectory
+    let gzTIMEbase = V.map (+1) $ appliedDistenceTable mainPiece (map location otherPices) 
+    let gzTrajBase = V.fromList $ take 64 $ repeat 0
+    let gzTraj     = V.update gzTrajBase $ V.fromList $ zip (map translateChessPairToVector actualMainTrajectory) (repeat 1)
+    let gzTIME     = V.fromList $ zipWith (*) [x | x <- (V.toList gzTraj)] [y | y <- (V.toList gzTIMEbase)]
+
+    --displayTable "mainDistance" $ appliedDistenceTable mainPiece (map location otherPices)
+    --displayTable "gzTIME" gzTIME
+
+    let primeTraj  = (mainPiece, mainTrajectory, (gzTIME V.! (translateChessPairToVector (last mainTrajectory))))
+    let baseResult = primeTraj : [makeNetworkTraj (color mainPiece) piece dest otherPices (gzTIME V.! (translateChessPairToVector dest)) | piece <- otherPices, dest <- actualMainTrajectory]
+    return $ filter (\x-> (length.scnd) x <= ((+1).fromInteger.thrd) x) $ filter (\x -> scnd x /= []) baseResult
+    
+makeNetworkTraj mColor piece dest obstPieces maxLength  
+    | mColor == color piece = do
+        --let bundle = bJT 1 piece dest (map location obstPieces)
+        let bundlebase = bJT 1 piece dest (map location obstPieces)
+        let bundle = filter (\x-> length x == 2) bundlebase 
+            --not needed, but I feel like it's a good idea to filter here in
+            --case generateChessZoneM2 changes it's filtering
+        if bundle == [] then (piece, [], -1)
+                        else (piece, head bundle, maxLength)
+    | otherwise = do
+        let bundle = bAJT 1 piece dest (map location obstPieces) maxLength
+        if bundle == [] then (piece, [], -1)
+                        else (piece, head bundle, maxLength)
+
+generateChessZoneM3 pieces mainPiece target [] = return [(mainPiece, [location mainPiece], 1)]
+generateChessZoneM3 pieces mainPiece target mainTrajectory = do
+    let zones' = [generateChessZoneM3' pieces mainPiece target mainTrajectory horizonMod | horizonMod <- [1..8]]
+    let zones = dropWhile (\x -> length x > 1) zones'
+    if zones == [] then return [] 
+                   else return $ (head.head) zones 
+
+generateChessZoneM3' pieces mainPiece target [] horizonMod = return [(mainPiece, [location mainPiece], 1)]
+generateChessZoneM3' pieces mainPiece target mainTrajectory horizonMod = do
+    let otherPices = (filter (\x -> x /= target && x /= mainPiece) pieces) 
+    let actualMainTrajectory = tail mainTrajectory
+    let gzTIMEbase = V.map (+1) $ appliedDistenceTable mainPiece (map location otherPices) 
+    let gzTrajBase = V.fromList $ take 64 $ repeat 0
+    let gzTraj     = V.update gzTrajBase $ V.fromList $ zip (map translateChessPairToVector actualMainTrajectory) (repeat 1)
+    let gzTIME     = V.fromList $ zipWith (*) [x | x <- (V.toList gzTraj)] [y | y <- (V.toList gzTIMEbase)]
+
+    --displayTable "mainDistance" $ appliedDistenceTable mainPiece (map location otherPices)
+    --displayTable "gzTIME" gzTIME
+
+    let primeTraj  = (mainPiece, mainTrajectory, (gzTIME V.! (translateChessPairToVector (last mainTrajectory))))
+    let baseResult = primeTraj : [makeNetworkTraj (color mainPiece) piece dest otherPices (gzTIME V.! (translateChessPairToVector dest)) | piece <- otherPices, dest <- actualMainTrajectory]
+    return $ filter (\x-> (length.scnd) x <= ((+horizonMod).fromInteger.thrd) x) $ filter (\x -> scnd x /= []) baseResult
+
+
+---------------------------------------original Grammar----------------------
+
 easierU :: U -> (Integer, Integer, Integer)
 easierU bigU = ( toInteger $ translateChessPairToVector $ frst bigU,
                  toInteger $ translateChessPairToVector $ scnd bigU,
@@ -99,32 +157,3 @@ gzf gs u@(x,y,l) v
 
 h_i gs = True
 
-generateChessZoneM2 pieces mainPiece target mainTrajectory = do
-    let otherPices = (filter (\x -> x /= target && x /= mainPiece) pieces) 
-    let actualMainTrajectory = tail mainTrajectory
-    let gzTIMEbase = V.map (+1) $ appliedDistenceTable mainPiece (map location otherPices) 
-    print gzTIMEbase
-    let gzTrajBase = V.fromList $ take 64 $ repeat 0
-    let gzTraj     = V.update gzTrajBase $ V.fromList $ zip (map translateChessPairToVector actualMainTrajectory) (repeat 1)
-    let gzTIME     = V.fromList $ zipWith (*) [x | x <- (V.toList gzTraj)] [y | y <- (V.toList gzTIMEbase)]
-
-    displayTable "mainDistance" $ appliedDistenceTable mainPiece (map location otherPices)
-    displayTable "gzTIME" gzTIME
-
-    let primeTraj  = (mainPiece, mainTrajectory, (gzTIME V.! (translateChessPairToVector (last mainTrajectory))))
-    let baseResult = primeTraj : [makeNetworkTraj (color mainPiece) piece dest otherPices (gzTIME V.! (translateChessPairToVector dest)) | piece <- otherPices, dest <- actualMainTrajectory]
-    return $ filter (\x-> (length.scnd) x <= ((+1).fromInteger.thrd) x) $ filter (\x -> scnd x /= []) baseResult
-    
-makeNetworkTraj mColor piece dest obstPieces maxLength  
-    | mColor == color piece = do
-        let bundle = bJT 1 piece dest (map location obstPieces)
-        --let bundlebase = bJT 1 piece dest (map location obstPieces)
-        --let bundle = filter (\x-> length x == 2) $ filter (\x -> x /= []) bundlebase 
-            --not needed, but I feel like it's a good idea to filter here in
-            --case generateChessZoneM2 changes it's filtering
-        if bundle == [] then (piece, [], -1)
-                        else (piece, head bundle, 1)
-    | otherwise = do
-        let bundle = bAJT 1 piece dest (map location obstPieces) maxLength
-        if bundle == [] then (piece, [], -1)
-                        else (piece, head bundle, maxLength)

@@ -8,6 +8,7 @@ import Board
 import qualified Data.Vector as V
 
 main = do
+{--
     let s_color = White
     let s_rank  = Bishop
     let start = (3,2)
@@ -28,13 +29,44 @@ main = do
     let zone = generateChessZoneM2 pieces subject target mainTrajectory 
     zone >>= return.zoneToString >>= putStrLn
 
-    let pieces2 = [ (makeChessPiece Black Pawn (1,5)),
-                    (makeChessPiece White Pawn (1,1)),
-                    (makeChessPiece White Pawn (6,6)),
-                    (makeChessPiece White King (1,8)),
-                    (makeChessPiece Black King (8,6))]
-    let zone2 = generateChessZoneM2 pieces2 (head pieces2) (head $ drop 1 pieces2) [(1,5),(1,4),(1,3),(1,2),(1,1)]
-    zone2 >>= return.zoneToString >>= putStrLn
+--}
+{--
+    let pieces = [ (makeChessPiece Black Pawn (1,5)),
+                   (makeChessPiece Black Target (6,8)),
+                   (makeChessPiece White Target (1,1)),
+                   (makeChessPiece White Pawn (6,6)),
+                   (makeChessPiece White King (1,8)),
+                   (makeChessPiece Black King (8,6))]
+--}
+    let pieces = [ (makeChessPiece White Bishop (3,2)),
+                   (makeChessPiece Black Pawn (4,5)),
+                   (makeChessPiece Black King (7,7)),
+                   (makeChessPiece Black Knight (2,7)),
+                   (makeChessPiece White King (7,1)),
+                   (makeChessPiece White Pawn (6,3)),
+                   (makeChessPiece White Pawn (5,5))]
+--}
+    let teamA = filter (\x -> White == color x) pieces
+    let teamB = filter (\x -> Black == color x) pieces
+    
+    let teamAZones = [ generateChessZoneM3 pieces mainPiece targetPiece (generationHelper mainPiece targetPiece pieces) | mainPiece <- teamA , targetPiece <- teamB ]
+    let teamBZones = [ generateChessZoneM3 pieces mainPiece targetPiece (generationHelper mainPiece targetPiece pieces) | mainPiece <- teamB , targetPiece <- teamA ]
 
+    let allZones = teamAZones ++ teamBZones
+    let allTheNames = [ (mainPiece, targetPiece) | mainPiece <- teamA , targetPiece <- teamB] ++ [ (mainPiece, targetPiece) | mainPiece <- teamB , targetPiece <- teamA]
+    printAllTheZones' allTheNames allZones 
+--    printAllTheZones allZones
 
     print "bye"
+
+generationHelper mainPiece targetPiece allPieces = do
+    let trajectories = bJT 1 mainPiece (location targetPiece) (map location $ filter (\x -> x/=mainPiece && x/=targetPiece) allPieces)
+    if trajectories == [] then [location mainPiece]
+                          else head trajectories
+
+printAllTheZones []     = putStrLn " --- "
+printAllTheZones (x:xs) = x >>= return.zoneToString >>= putStrLn >> putStrLn " --- " >> printAllTheZones xs
+
+printAllTheZones' [] _    = putStrLn " --- "
+printAllTheZones' (n:ns) (x:xs) = print n >> x >>= return.zoneToString >>= putStrLn >> putStrLn " --- " >> printAllTheZones' ns xs
+

@@ -1,5 +1,4 @@
-module Main where
-
+module Main where 
 import System.Environment
 import Control.Exception as EX
 import Data.Char (toUpper)
@@ -11,13 +10,15 @@ import DistanceTables
 
 
 
+strToLocation ::  [String] -> [(Int, Int)]
 strToLocation [] = []
 strToLocation str = do
-    let x = read (head str) :: Int
+    let x = read ( head str) :: Int
     let y = read ( head (drop 1 str) ) :: Int
     (x, y) : strToLocation (drop 3 str)
 
 
+mainProgram ::  IO ()
 mainProgram = do
     args <- getArgs
     case (map toUpper (head args)) of 
@@ -30,6 +31,7 @@ mainProgram = do
 
 
 
+displayTableIO ::  [String] -> IO ()
 displayTableIO args = do
     let tablename = head args
     let colour = head  $ drop 1 args
@@ -43,6 +45,7 @@ displayTableIO args = do
     let distance_table = generateDistenceTableObst offserObst (getColorFromString colour) (getRankFromString rnk)
     displayTable tablename $ distance_table
 
+displayChessTableIO ::  [String] -> IO ()
 displayChessTableIO args = do
     let tablename = head args
     let colour = head  $ drop 1 args
@@ -163,4 +166,5 @@ makeNodeString obsticals node@(x,y)
     | node `elem` obsticals = "     " ++ locationOnChessboard node ++ "[label=\"" ++ locationOnChessboard node ++ "\" pos=\"" ++ (show x) ++ "," ++ (show y) ++ "!\" fontcolor=red] \n" 
     | otherwise             = "     " ++ locationOnChessboard node ++ "[label=\"" ++ locationOnChessboard node ++ "\" pos=\"" ++ (show (9-x)) ++ "," ++ (show y) ++ "!\"] \n" 
 --}
+main ::  IO ()
 main = EX.catch mainProgram showHelp

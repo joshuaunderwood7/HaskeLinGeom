@@ -14,7 +14,7 @@ getColorFromString x
     | (map toUpper x) == "BLACK" = Black
     | otherwise = Grey
 
-data Rank = Pawn | Knight | Bishop | Rook | Queen | King | Obstacle | Underwood
+data Rank = Pawn | Knight | Bishop | Rook | Queen | King | Obstacle | Underwood | Target
     deriving (Eq, Show)
 
 getRankFromString x
@@ -25,6 +25,7 @@ getRankFromString x
     | (map toUpper x) == "QUEEN"     = Queen
     | (map toUpper x) == "KING"      = King
     | (map toUpper x) == "UNDERWOOD" = Underwood
+    | (map toUpper x) == "TARGET"    = Target
     | otherwise  = Obstacle
 
 data Piece = Piece { movement :: (Location -> Bool) ,
