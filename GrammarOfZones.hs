@@ -10,7 +10,11 @@ frst (x,_,_) = x
 scnd (_,x,_) = x
 thrd (_,_,x) = x
 
+--TODO: Remove these functions from the IO Monad.
 
+--This will generate zones but only first negations and along the shortest path
+-- clearly this will not do, but it is the base for the M3 funtion below
+generateChessZoneM2 :: Monad m =>[Piece]-> Piece-> Piece-> [(Int, Int)]-> m [(Piece, [Location], Integer)]
 generateChessZoneM2 _ mainPiece _ [] = return [(mainPiece, [location mainPiece], 1)]
 generateChessZoneM2 pieces mainPiece target mainTrajectory = do
     let otherPices = (filter (\x -> x /= target && x /= mainPiece) pieces) 
@@ -27,6 +31,11 @@ generateChessZoneM2 pieces mainPiece target mainTrajectory = do
     let baseResult = primeTraj : [makeNetworkTraj (color mainPiece) piece dest otherPices (gzTIME V.! (translateChessPairToVector dest)) | piece <- otherPices, dest <- actualMainTrajectory]
     return $ filter (\x-> (length.scnd) x <= ((+1).fromInteger.thrd) x) $ filter (\x -> scnd x /= []) baseResult
     
+-- This makes the trajectories of the pieces for the generateChessZoneMX
+-- functions,  What this provides is the distence = 1 for same color and
+-- distence = maxLength for opposing color.  Also, it simply takes the head of
+-- the bundles, so this is where the trajectory selection will take place
+makeNetworkTraj :: Color-> Piece-> Location-> [Piece]-> Integer-> (Piece, [Location], Integer)
 makeNetworkTraj mColor piece dest obstPieces maxLength  
     | mColor == color piece = do
         --let bundle = bJT 1 piece dest (map location obstPieces)
@@ -41,6 +50,8 @@ makeNetworkTraj mColor piece dest obstPieces maxLength
         if bundle == [] then (piece, [], -1)
                         else (piece, head bundle, maxLength)
 
+-- More advanced, generateChessZoneM3 will increment the horizon until 8, and
+-- return the first one that has a zone, if any.
 generateChessZoneM3 pieces mainPiece target [] = return [(mainPiece, [location mainPiece], 1)]
 generateChessZoneM3 pieces mainPiece target mainTrajectory = do
     let zones' = [generateChessZoneM3' pieces mainPiece target mainTrajectory horizonMod | horizonMod <- [1..8]]
@@ -61,8 +72,33 @@ generateChessZoneM3' pieces mainPiece target mainTrajectory horizonMod = do
     --displayTable "gzTIME" gzTIME
 
     let primeTraj  = (mainPiece, mainTrajectory, (gzTIME V.! (translateChessPairToVector (last mainTrajectory))))
-    let baseResult = primeTraj : [makeNetworkTraj (color mainPiece) piece dest otherPices (gzTIME V.! (translateChessPairToVector dest)) | piece <- otherPices, dest <- actualMainTrajectory]
-    return $ filter (\x-> (length.scnd) x <= ((+horizonMod).fromInteger.thrd) x) $ filter (\x -> scnd x /= []) baseResult
+    let baseResultTail = [makeNetworkTraj (color mainPiece) piece dest otherPices (gzTIME V.! (translateChessPairToVector dest)) | piece <- otherPices, dest <- actualMainTrajectory]
+    let resultTail = filter (\x-> (length.scnd) x <= ((+horizonMod).fromInteger.thrd) x) $ filter (\x -> scnd x /= []) baseResultTail
+
+    -- this is where we need to add nTH negation loop
+    let baseResultTail' = generateChessZoneM3applyNeg resultTail (color mainPiece) otherPices
+
+
+    let baseResult = primeTraj : baseResultTail'
+    let result = filter (\x-> (length.scnd) x <= ((+horizonMod).fromInteger.thrd) x) $ filter (\x -> scnd x /= []) baseResult
+    return result
+
+generateChessZoneM3applyNeg :: [(Piece, [Location], Integer)]-> Color -> [Piece] -> [(Piece, [Location], Integer)]
+generateChessZoneM3applyNeg [] _ _ = []
+generateChessZoneM3applyNeg result@(rh:rt) originalColor otherPices
+    = generateChessZoneM3negations otherPices (frst rh) (scnd rh) originalColor (thrd rh - (toInteger.length.scnd) rh + (toInteger 1)) ++ 
+        generateChessZoneM3applyNeg rt originalColor otherPices
+    
+    
+
+-- hand this otherPices as pieces list to pre-eliminate mainPiece and target
+generateChessZoneM3negations :: [Piece]-> Piece-> [Location]-> Color-> Integer-> [(Piece, [Location], Integer)]
+generateChessZoneM3negations pieces mainPiece mainTrajectory originalColor maxLength = do
+    let otherPices = filter (/=mainPiece) pieces
+    let actualMainTrajectory = tail.init $ mainTrajectory
+    let primeTraj  = (mainPiece, mainTrajectory, maxLength)
+    let baseResult = primeTraj : [makeNetworkTraj originalColor piece dest otherPices maxLength | piece <- otherPices, dest <- actualMainTrajectory]
+    filter (\x-> (length.scnd) x <= (fromInteger.thrd) x) $ filter (\x -> scnd x /= []) baseResult
 
 
 ---------------------------------------original Grammar----------------------

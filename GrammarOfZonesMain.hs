@@ -7,6 +7,7 @@ import Piece
 import Board
 import qualified Data.Vector as V
 
+main ::  IO ()
 main = do
 {--
     let s_color = White
@@ -59,14 +60,17 @@ main = do
 
     print "bye"
 
+generationHelper ::  Piece -> Piece -> [Piece] -> [Location]
 generationHelper mainPiece targetPiece allPieces = do
     let trajectories = bJT 1 mainPiece (location targetPiece) (map location $ filter (\x -> x/=mainPiece && x/=targetPiece) allPieces)
     if trajectories == [] then [location mainPiece]
                           else head trajectories
 
+printAllTheZones :: (Show a, Show a1) => [IO [(a, [Location], a1)]] -> IO ()
 printAllTheZones []     = putStrLn " --- "
 printAllTheZones (x:xs) = x >>= return.zoneToString >>= putStrLn >> putStrLn " --- " >> printAllTheZones xs
 
+printAllTheZones' :: (Show a1, Show a2, Show a) =>[a] -> [IO [(a1, [Location], a2)]] -> IO ()
 printAllTheZones' [] _    = putStrLn " --- "
 printAllTheZones' (n:ns) (x:xs) = print n >> x >>= return.zoneToString >>= putStrLn >> putStrLn " --- " >> printAllTheZones' ns xs
 
