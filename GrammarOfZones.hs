@@ -52,6 +52,7 @@ makeNetworkTraj mColor piece dest obstPieces maxLength
 
 -- More advanced, generateChessZoneM3 will increment the horizon until 8, and
 -- return the first one that has a zone, if any.
+generateChessZoneM3 :: Monad m =>[Piece]-> Piece-> Piece-> [(Int, Int)]-> m [(Piece, [Location], Integer)]
 generateChessZoneM3 pieces mainPiece target [] = return [(mainPiece, [location mainPiece], 1)]
 generateChessZoneM3 pieces mainPiece target mainTrajectory = do
     let zones' = [generateChessZoneM3' pieces mainPiece target mainTrajectory horizonMod | horizonMod <- [1..8]]

@@ -6,6 +6,7 @@ import R
 import Piece
 import Board
 import qualified Data.Vector as V
+import Control.Monad
 
 main ::  IO ()
 main = do
@@ -31,7 +32,6 @@ main = do
     zone >>= return.zoneToString >>= putStrLn
 
 --}
-{--
     let pieces = [ (makeChessPiece Black Pawn (1,5)),
                    (makeChessPiece Black Target (6,8)),
                    (makeChessPiece White Target (1,1)),
@@ -39,6 +39,7 @@ main = do
                    (makeChessPiece White King (1,8)),
                    (makeChessPiece Black King (8,6))]
 --}
+{--
     let pieces = [ (makeChessPiece White Bishop (3,2)),
                    (makeChessPiece Black Pawn (4,5)),
                    (makeChessPiece Black King (7,7)),
@@ -53,7 +54,10 @@ main = do
     let teamAZones = [ generateChessZoneM3 pieces mainPiece targetPiece (generationHelper mainPiece targetPiece pieces) | mainPiece <- teamA , targetPiece <- teamB ]
     let teamBZones = [ generateChessZoneM3 pieces mainPiece targetPiece (generationHelper mainPiece targetPiece pieces) | mainPiece <- teamB , targetPiece <- teamA ]
 
-    let allZones = teamAZones ++ teamBZones
+    let teamAZonesSignificant = map (liftM $ filter (\(_,_,x) -> x > 1)) teamAZones
+    let teamBZonesSignificant = map (liftM $ filter (\(_,_,x) -> x > 1)) teamBZones
+
+    let allZones = teamAZonesSignificant ++ teamBZonesSignificant
     let allTheNames = [ (mainPiece, targetPiece) | mainPiece <- teamA , targetPiece <- teamB] ++ [ (mainPiece, targetPiece) | mainPiece <- teamB , targetPiece <- teamA]
     printAllTheZones' allTheNames allZones 
 --    printAllTheZones allZones
