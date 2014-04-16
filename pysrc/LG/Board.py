@@ -1,3 +1,6 @@
+def indexToLocation(x):
+    return ( (8-(x%8)) , (int(x/8)+1) )
+
 class Location:
     def __init__(self, x=1, y=1, z=1):
         self.x = x

@@ -1,5 +1,6 @@
 import re
-import LG.Piece as P
+import LG.R as R
+#import LG.Piece as P
 import LG.Board as B
 
 
@@ -27,20 +28,67 @@ INITIAL_STATE['p_1'] = "BB"
 INITIAL_STATE['p_2'] = "BF"
 INITIAL_STATE['p_3'] = "WB"
 INITIAL_STATE['p_4'] = "WF"
+INITIAL_STATE['p_5'] = "BT"
+INITIAL_STATE['p_6'] = "WT"
 
 # initialize P1 and P2
-INITIAL_STATE["P1"] = set([INITIAL_STATE['p_1'], INITIAL_STATE['p_2']])
-INITIAL_STATE["P2"] = set([INITIAL_STATE['p_3'], INITIAL_STATE['p_4']])
+INITIAL_STATE["P1"] = set([INITIAL_STATE['p_1'], INITIAL_STATE['p_2'], INITIAL_STATE['p_5']])
+INITIAL_STATE["P2"] = set([INITIAL_STATE['p_3'], INITIAL_STATE['p_4'], INITIAL_STATE['p_6']])
+
+INITIAL_STATE['ON_p_1'] = INITIAL_STATE['x_39']
+INITIAL_STATE['ON_p_2'] = INITIAL_STATE['x_40']
+INITIAL_STATE['ON_p_3'] = INITIAL_STATE['x_42']
+INITIAL_STATE['ON_p_4'] = INITIAL_STATE['x_63']
+INITIAL_STATE['ON_p_5'] = INITIAL_STATE['x_58']
+INITIAL_STATE['ON_p_6'] = INITIAL_STATE['x_7']
 
 
 def Rp_1():
-    x1 = 1
-    x2 = 2
+    global INITIAL_STATE
+    x1 , x2 = B.indexToLocation(INITIAL_STATE['ON_p_1'])
     for i in range(8):
         for j in range(8):
-            INITIAL_STATE["Rp_1" + str(i) + str(j)] = P.r_pB(B.Location(x=x1,y=x2),B.Location(x=i+1,y=j+1))
+            INITIAL_STATE["Rp_1_" + str(i+1) + str(j+1)] = R.r_pB(B.Location(x=x1,y=x2),B.Location(x=i+1,y=j+1))
+def Rp_2():
+    global INITIAL_STATE
+    x1 , x2 = B.indexToLocation(INITIAL_STATE['ON_p_2'])
+    for i in range(8):
+        for j in range(8):
+            INITIAL_STATE["Rp_2_" + str(i+1) + str(j+1)] = R.r_k(B.Location(x=x1,y=x2),B.Location(x=i+1,y=j+1))
+def Rp_3():
+    global INITIAL_STATE
+    x1 , x2 = B.indexToLocation(INITIAL_STATE['ON_p_3'])
+    for i in range(8):
+        for j in range(8):
+            INITIAL_STATE["Rp_3_" + str(i+1) + str(j+1)] = R.r_pW(B.Location(x=x1,y=x2),B.Location(x=i+1,y=j+1))
+def Rp_4():
+    global INITIAL_STATE
+    x1 , x2 = B.indexToLocation(INITIAL_STATE['ON_p_4'])
+    for i in range(8):
+        for j in range(8):
+            INITIAL_STATE["Rp_4_" + str(i+1) + str(j+1)] = R.r_k(B.Location(x=x1,y=x2),B.Location(x=i+1,y=j+1))
+def Rp_5():
+    global INITIAL_STATE
+    #x1 , x2 = B.indexToLocation(INITIAL_STATE['ON_p_5'])
+    for i in range(8):
+        for j in range(8):
+            INITIAL_STATE.update({"Rp_5_" + str(i+1) + str(j+1) : False})
+def Rp_6():
+    global INITIAL_STATE
+    #x1 , x2 = B.indexToLocation(INITIAL_STATE['ON_p_6'])
+    for i in range(8):
+        for j in range(8):
+            INITIAL_STATE.update({"Rp_6_" + str(i+1) + str(j+1) : False})
 
-print INITIAL_STATE
+Rp_1()
+Rp_2()
+Rp_3()
+Rp_4()
+Rp_5()
+Rp_6()
+
+from pprint import pprint
+pprint(INITIAL_STATE)
 
 
 class GrammarState():
