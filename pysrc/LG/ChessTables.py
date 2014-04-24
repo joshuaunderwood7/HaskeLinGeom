@@ -11,6 +11,16 @@ Black_Pawn = ["X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "
 def breakIntoRows(table):
     print [[table[x+(y*15)] for x in range(15)] for y in range(15)]
 
+def indexToLocation(x):
+    return ( (8-(x%8)) , (int(x/8)+1) )
 
-def translateLocation(location, board):
+def locationToIndex(locat):
+    x, y = locat
+    return (8 - x) + ((y-1) * 8)
+
+def applyToChessBoard(locat, dTable): 
+    x0, y0 = locat
+    offsetBoard = [(x,y) for x in range(x0, x0+8) for y in range(y0, y0+8)] 
+    return [dTable[locationToIndex(locat)] for locat in offsetBoard]
+
 
