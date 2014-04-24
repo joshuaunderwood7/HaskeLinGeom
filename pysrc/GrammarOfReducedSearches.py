@@ -42,6 +42,37 @@ INITIAL_STATE['ON_p_4'] = INITIAL_STATE['x_63']
 INITIAL_STATE['ON_p_5'] = INITIAL_STATE['x_58']
 INITIAL_STATE['ON_p_6'] = INITIAL_STATE['x_7']
 
+# This is a specific CUT function, will only work for this problem
+#  How this works, is that it tests if the White Bomber is in any of the 
+#  Gateways.
+
+def CUT(state):
+    winstate = 0
+    if state["ON_p_4"] in [state["x_" + str(x)] for x in range(45,48)]] and state["ON_p_1"] == state["x_39"]: 
+        winstate = winstate + 1
+    elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(36,40)]] and state["ON_p_1"] == state["x_31"]: 
+        winstate = winstate + 1
+    elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(28,32)]] and state["ON_p_1"] == state["x_23"]: 
+        winstate = winstate + 1
+    elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(21,24)]] and state["ON_p_1"] == state["x_15"]: 
+        winstate = winstate + 1
+    elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(14,16)]] and state["ON_p_1"] == state["x_7"]: 
+        winstate = winstate + 1
+    else:
+        winstate = winstate - 1
+
+    elif state["ON_p_4"] in [state["x_" + str(x)] for x in [61,53,45,37]] and state["ON_p_2"] == state["x_40"]: 
+        winstate = winstate + 1
+    elif state["ON_p_4"] in [state["x_" + str(x)] for x in [60,52,44,36]] and state["ON_p_2"] in [41, 49]: 
+        winstate = winstate + 1
+    else:
+        winstate = winstate - 1
+
+    if winstate > 1: then winstate = 1
+    if winstate < -1: then winstate = -1
+
+    return winstate
+
 
 def Rp_1():
     global INITIAL_STATE
@@ -87,8 +118,8 @@ Rp_4()
 Rp_5()
 Rp_6()
 
-from pprint import pprint
-pprint(INITIAL_STATE)
+#from pprint import pprint
+#pprint(INITIAL_STATE)
 
 
 class GrammarState():
@@ -160,6 +191,8 @@ class GrammarState():
         result += ' PARENT = ' + str(self._PARENT)
         result += "\n"
         return result
+
+
 
 def m_S(state):
     return None
@@ -300,6 +333,7 @@ def q3(g_state, inputString):
     else:
         q0(g_state)
         return (g_state, inputString)
+
 
 def main(): 
     g_state = GrammarState()

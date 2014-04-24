@@ -48,4 +48,4 @@ def generateDistenceTable(color, rank, board = B.distanceboard):
 
     return currentTable
 
-
+print generateDistenceTable("BLACK", "PAWN")
