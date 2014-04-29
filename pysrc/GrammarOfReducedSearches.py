@@ -360,6 +360,9 @@ def q3(g_state, inputString):
 
 def main(): 
     g_state = GrammarState()
+    global INITIAL_STATE
+    print INITIAL_STATE
+    """
     inputString = "S(0)"
     print "before Start"
     print g_state, inputString
@@ -375,6 +378,7 @@ def main():
     print 'two loop'
     theNewG_state , theNewString = q2(theNewG_state, theNewString)
     print theNewG_state, theNewString
+    """
 
 
 if __name__ == "__main__" :

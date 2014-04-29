@@ -109,6 +109,8 @@ Black_Pawn = ["X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X", "
 
 def breakIntoRows(table):
     print [[table[x+(y*15)] for x in range(15)] for y in range(15)]
+def breakIntoChessRows(table):
+    print [[table[x+(y*8)] for x in range(8)] for y in range(8)]
 
 def indexToLocation(x):
     return ( (8-(x%8)) , (int(x/8)+1) )
@@ -121,19 +123,46 @@ def locationToIndex(locat):
     x, y = locat
     return (8 - x) + ((y-1) * 8)
 
+def chessLocationToLocation(locat):
+    letter, number = (locat[0], locat[1])
+    letter = 73 - ord(letter.upper())
+    number = ord(number)-48
+    return (letter, number)
+
+def chessLocationToIndex(locat):
+    return locationToIndex(chessLocationToLocation(locat))
+
+def locationToChessLocation(locat):
+    x,number = locat
+    letter = "hgfedcba"[x-1]
+    return letter+str(number)
+
 def applyToChessBoard(locat, dTable): 
     x0, y0 = locat
     x0 = 9 - x0
     offsetBoard = [(x,y) for x in range(x0, x0+8) for y in range(y0, y0+8)] 
     temp =  [dTable[locationToDestIndex(locat)] for locat in offsetBoard]
-    pprintChessTable(temp)
+    #pprintChessTable(temp)
+    #print
     return temp
 
+def getDistanceboard(piecetype):
+    """ piecetype: 
+        BK, BF, WK, Wk = King
+        BP, BB = Black_Pawn
+        WP, WB = White_Pawn
+        all others will be implemented as needed
+        """
+    if piecetype in ["BK", "BF", "WF", "WK"] : piecetype = King
+    elif piecetype in ["BB", "BP"] : piecetype = Black_Pawn
+    elif piecetype in ["WB", "WP"] : piecetype = White_Pawn
+    return piecetype
+
+
 def pprintChessTable(dTable):
-    for yi in range(8): 
-        y = 8 - yi
-        for xi in range(8):
-            x = 8 - xi
+    for x in range(1,9): 
+        for y in range(1,9):
+            if len(dTable[locationToIndex((x,y))]) < 2: print '',
             print dTable[locationToIndex((x,y))],
         print
 
@@ -142,12 +171,9 @@ def distance(piecetype, fromLocat, toLocat):
         BK, BF, WK, Wk = King
         BP, BB = Black_Pawn
         WP, WB = White_Pawn
-        all others will be implemented ad needed
+        all others will be implemented as needed
         """
-    if piecetype in ["BK", "BF", "WF", "WK"] : piecetype = King
-    elif piecetype in ["BB", "BP"] : piecetype = Black_Pawn
-    elif piecetype in ["WB", "WP"] : piecetype = White_Pawn
-
+    piecetype = getDistanceboard(piecetype)
     return applyToChessBoard(fromLocat, piecetype)[locationToIndex(toLocat)]
 
 #pprintChessTable(ChessBoard)
