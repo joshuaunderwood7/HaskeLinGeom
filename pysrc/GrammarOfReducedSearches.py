@@ -2,6 +2,7 @@ import re
 import LG.R as R
 #import LG.Piece as P
 import LG.Board as B
+import LG.ChessTables as C
 
 
 """ so here I am assuming that the rest of my program written in haskell 
@@ -46,32 +47,33 @@ INITIAL_STATE['ON_p_6'] = INITIAL_STATE['x_7']
 #  How this works, is that it tests if the White Bomber is in any of the 
 #  Gateways.
 
-def CUT(state):
+def CUT(g_state):
+    state = g_state.getSTATE()
     winstate = 0
-    if state["ON_p_4"] in [state["x_" + str(x)] for x in range(45,48)]] and state["ON_p_1"] == state["x_39"]: 
+    if state["ON_p_4"] in [state["x_" + str(x)] for x in range(45,48)] and state["ON_p_1"] == state["x_39"]: 
         winstate = winstate + 1
-    elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(36,40)]] and state["ON_p_1"] == state["x_31"]: 
+    elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(36,40)] and state["ON_p_1"] == state["x_31"]: 
         winstate = winstate + 1
-    elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(28,32)]] and state["ON_p_1"] == state["x_23"]: 
+    elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(28,32)] and state["ON_p_1"] == state["x_23"]: 
         winstate = winstate + 1
-    elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(21,24)]] and state["ON_p_1"] == state["x_15"]: 
+    elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(21,24)] and state["ON_p_1"] == state["x_15"]: 
         winstate = winstate + 1
-    elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(14,16)]] and state["ON_p_1"] == state["x_7"]: 
+    elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(14,16)] and state["ON_p_1"] == state["x_7"]: 
         winstate = winstate + 1
     else:
         winstate = winstate - 1
 
-    elif state["ON_p_4"] in [state["x_" + str(x)] for x in [61,53,45,37]] and state["ON_p_2"] == state["x_40"]: 
+    if state["ON_p_4"] in [state["x_" + str(x)] for x in [61,53,45,37]] and state["ON_p_2"] == state["x_40"]: 
         winstate = winstate + 1
     elif state["ON_p_4"] in [state["x_" + str(x)] for x in [60,52,44,36]] and state["ON_p_2"] in [41, 49]: 
         winstate = winstate + 1
     else:
         winstate = winstate - 1
 
-    if winstate > 1: then winstate = 1
-    if winstate < -1: then winstate = -1
+    if winstate > 1:   winstate = 1
+    if winstate < -1:  winstate = -1
 
-    return winstate
+    return (winstate >= 0)
 
 
 def Rp_1():
@@ -124,6 +126,7 @@ Rp_6()
 
 class GrammarState():
     def __init__(self):
+        global INITIAL_STATE
         self._i       = 0
         self._END     = 0
         self._CHILD   = []
@@ -137,7 +140,7 @@ class GrammarState():
         self._TO    = []
         self._WHO   = []
         self._SIGN  = 1 
-        self._STATE = ""
+        self._STATE = INITIAL_STATE
         self.BIG_NUMBER = 256
 
     def _setter(self, var, index, val):
@@ -237,15 +240,35 @@ def q1(g_state, inputString):
         return (g_state, inputString)
 
 def q2_gs(g_state, inputString):
-    """ q2_gs = (Ep Ex Ey (
-                            ( ((SIGN =  1) and (p in P_1)) or 
-                              ((SIGN = -1) and (p in P_2)) ) 
-                            and ( ON(p) = x) and (R_p(x,y)) 
-                            and (d < dmax) 
-                            and not CUT(g_state, inputString)
-                          ))
     """
-    return True
+      So right now I get that these are all safeguards, and that
+      The Grammar it's self will generate the transitions, but
+      I can simulate all of that to make sure that there are good moves,
+      and all I really care about is that CUT returns True.
+    """
+    return not CUT(g_state)
+
+    signAndTeam = True
+    onSpot = True
+    canReach = True
+    distLessThanMax = True
+    # q2_gs = (Ep Ex Ey (
+    #for p in range(7):
+     #for x in range(65):
+     #for y in range(65):
+        #                        ( ((SIGN =  1) and (p in P_1)) or 
+        #                          ((SIGN = -1) and (p in P_2)) ) 
+     #   signAndTeam = (g_state.getSIGN() == 1  and p in g_state.getSTATE['P_1']) or \
+     #                 (g_state.getSIGN() == -1 and p in g_state.getSTATE['P_2'])
+        #                        and ( ON(p) = x) and (R_p(x,y)) 
+     #   onSpot = g_state.getSTATE['ON_p_' + str(p)] == g_state.getSTATE['x_' + str(x)]
+     #   canReach = g_state.getSTATE['R_p_' + str(p)]
+        #                        and (d < dmax) 
+     #   distLessThanMax = C.distance(g_state.getSTATE['p_' + str(p)], C.indexToLocation(x), C.indexToLocation(y)) < g_state.getD
+        #                        and not CUT(g_state, inputString)
+        #                      ))
+    notCUT = CUT(g_state)
+    return all([onSpot, canReach, distLessThanMax, notCUT])
 
 
 
@@ -352,6 +375,7 @@ def main():
     print 'two loop'
     theNewG_state , theNewString = q2(theNewG_state, theNewString)
     print theNewG_state, theNewString
+
 
 if __name__ == "__main__" :
     main()

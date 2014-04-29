@@ -123,10 +123,11 @@ def locationToIndex(locat):
 
 def applyToChessBoard(locat, dTable): 
     x0, y0 = locat
-    x0 = 8 - x0
+    x0 = 9 - x0
     offsetBoard = [(x,y) for x in range(x0, x0+8) for y in range(y0, y0+8)] 
-    pprintChessTable(offsetBoard)
-    return [dTable[locationToDestIndex(locat)] for locat in offsetBoard]
+    temp =  [dTable[locationToDestIndex(locat)] for locat in offsetBoard]
+    pprintChessTable(temp)
+    return temp
 
 def pprintChessTable(dTable):
     for yi in range(8): 
@@ -136,6 +137,20 @@ def pprintChessTable(dTable):
             print dTable[locationToIndex((x,y))],
         print
 
-pprintChessTable(ChessBoard)
+def distance(piecetype, fromLocat, toLocat):
+    """ piecetype: 
+        BK, BF, WK, Wk = King
+        BP, BB = Black_Pawn
+        WP, WB = White_Pawn
+        all others will be implemented ad needed
+        """
+    if piecetype in ["BK", "BF", "WF", "WK"] : piecetype = King
+    elif piecetype in ["BB", "BP"] : piecetype = Black_Pawn
+    elif piecetype in ["WB", "WP"] : piecetype = White_Pawn
+
+    return applyToChessBoard(fromLocat, piecetype)[locationToIndex(toLocat)]
+
+#pprintChessTable(ChessBoard)
 #pprintChessTable(applyToChessBoard((5,5), Knight))
+#print  distance("BF", (5,5), (5,6)) 
 
