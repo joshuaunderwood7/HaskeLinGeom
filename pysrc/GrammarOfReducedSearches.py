@@ -5,6 +5,7 @@ import LG.Board as BO
 import LG.ChessTables as C
 from LG.B import * 
 import LG.transitions as T
+import itertools
 
 
 """ so here I am assuming that the rest of my program written in haskell 
@@ -371,7 +372,7 @@ def movePiece(g_state, piece, start, dest):
         print "Could not find pice in state"
         return STATE
 
-    if STATE['ON_p_' + str(pieceNumber)] != start:
+    if STATE['ON_p_' + str(pieceNumber)] != C.locationToIndex(start):
         print "p_" + str(pieceNumber) + " is not on " + str(start)
         return STATE
     x,y = dest
@@ -389,16 +390,35 @@ def movePiece(g_state, piece, start, dest):
     Rp_5()
     Rp_6()
 
-
-
+def MOVE(g_state, turn, zones):
+    """
+    This is the big one.
+    turn in {"P1", "P2"}
+    """
+    pieces = g_state.getSTATE()[turn]
+    moves = filter((lambda x: x != []), [B(g_state,piece,T.snagBs(piece, zone)) for piece in pieces for zone in zones])
+    Bs = []
+    for b in list(itertools.chain.from_iterable(moves)):
+        print "----" + str(b)
+        if b[0] == 'a': 
+            Bs.append(b[2:4])
+        elif b[0] == "B": 
+            Bs.append(nextMovesToList(b))
+        else: 
+            print "Not a or B"
+    return Bs
+    
 
 
 def main(): 
     g_state = GrammarState()
-    movePiece(g_state,"WF",C.chessLocationToLocation("h8"),C.chessLocationToLocation("g7"))
-    print B(g_state, "WF", "B(h8:h1)")
-    print nextMovesToList(B(g_state, "WF", "B(h8:h1)"))
+    p1Moves =  MOVE(g_state, "P1", [T.mainZone1, T.mainZone2])
+    p2Moves =  MOVE(g_state, "P2", [T.mainZone1, T.mainZone2])
+    print p1Moves
     """
+    movePiece(g_state,"WF",C.chessLocationToLocation("h8"),C.chessLocationToLocation("g7"))
+    print B(g_state, "WF", "B(g7:h1)")
+    print nextMovesToList(B(g_state, "WF", "B(g7:h1)"))
     inputString = "S(0)"
     print "before Start"
     print g_state, inputString

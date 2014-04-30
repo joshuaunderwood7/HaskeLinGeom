@@ -62,3 +62,4 @@ def nextMovesToList(inputString):
     nextMoves = parts[0][1:-1].split(',')
     return nextMoves
 
+

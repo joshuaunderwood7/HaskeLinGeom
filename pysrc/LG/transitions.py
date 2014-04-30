@@ -37,6 +37,10 @@ def printZone(zone):
   print stringify(zone)
   return zone
 
-printZone(preZone1)
-printZone(transition(preZone1, "WF", '', 'g7'))
-printZone(transition(preZone1, "BB", '', ''))
+def snagBs(piece, zone):
+    return [move[1] for move in objectify(zone) if move[0] == piece]
+
+#printZone(preZone1)
+#printZone(transition(preZone1, "WF", '', 'g7'))
+#printZone(transition(preZone1, "BB", '', ''))
+#print snagBs("WF", mainZone1)
