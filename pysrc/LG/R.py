@@ -17,8 +17,8 @@ r_distance = MakeRForBoard(Board.distanceboard)
 
 # pawns
 #--pawns are difficult and this is not corrct
-def r_pB(x,y): return ( ( x.x == y.x ) and ((x.y-y.y == -1)) )
-def r_pW(x,y): return ( ( x.x == y.x ) and ((x.y-y.y ==  1)) )
+def r_pW(x,y): return ( ( x.x == y.x ) and ((x.y-y.y == -1)) )
+def r_pB(x,y): return ( ( x.x == y.x ) and ((x.y-y.y ==  1)) )
 
 #Knights
 def r_n(x,y):

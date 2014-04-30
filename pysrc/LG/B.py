@@ -57,9 +57,15 @@ def B_prime(g_state, piecetype, start, finish):
 
 
 def nextMovesToList(inputString):
-    if inputString[0] != 'b': return []
-    parts = inputString[2:-1].split(';')
-    nextMoves = parts[0][1:-1].split(',')
-    return nextMoves
+    if inputString[0] == 'a':
+        moves = [x[1:3] for x in inputString.split('a') if len(x) == 4]
+        if len(moves) == 1: return []
+        return moves[1]
+    elif inputString[0] == 'b':
+        parts = inputString[2:-1].split(';')
+        nextMoves = parts[0][1:-1].split(',')
+        return nextMoves
+    else:
+        return []
 
 

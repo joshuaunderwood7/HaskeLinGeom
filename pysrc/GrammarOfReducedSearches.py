@@ -6,6 +6,7 @@ import LG.ChessTables as C
 from LG.B import * 
 import LG.transitions as T
 import itertools
+from collections import Counter
 
 
 """ so here I am assuming that the rest of my program written in haskell 
@@ -104,17 +105,19 @@ def Rp_4():
         for j in range(8):
             INITIAL_STATE["Rp_4_" + str(i+1) + str(j+1)] = R.r_k(BO.Location(x=x1,y=x2),BO.Location(x=i+1,y=j+1))
 def Rp_5():
-    global INITIAL_STATE
-    #x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_5'])
-    for i in range(8):
-        for j in range(8):
-            INITIAL_STATE.update({"Rp_5_" + str(i+1) + str(j+1) : False})
+    pass
+    #global INITIAL_STATE
+    ##x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_5'])
+    #for i in range(8):
+    #    for j in range(8):
+    #        INITIAL_STATE.update({"Rp_5_" + str(i+1) + str(j+1) : False})
 def Rp_6():
-    global INITIAL_STATE
-    #x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_6'])
-    for i in range(8):
-        for j in range(8):
-            INITIAL_STATE.update({"Rp_6_" + str(i+1) + str(j+1) : False})
+    pass
+    #global INITIAL_STATE
+    ##x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_6'])
+    #for i in range(8):
+    #    for j in range(8):
+    #        INITIAL_STATE.update({"Rp_6_" + str(i+1) + str(j+1) : False})
 
 Rp_1()
 Rp_2()
@@ -378,6 +381,7 @@ def movePiece(g_state, piece, start, dest):
     x,y = dest
     if not STATE['Rp_' + str(pieceNumber) + "_" + str(x) + str(y)]:
         print "p_" + str(pieceNumber) + " cannot reach " + str(dest)
+        print 'Rp_' + str(pieceNumber) + "_" + str(x) + str(y) + ' = ' + str(STATE['Rp_' + str(pieceNumber) + "_" + str(x) + str(y)]) 
         return STATE
 
     STATE['ON_p_' + str(pieceNumber)] = STATE["x_" + str(C.locationToIndex(dest))]  
@@ -390,35 +394,58 @@ def movePiece(g_state, piece, start, dest):
     Rp_5()
     Rp_6()
 
-def MOVE(g_state, turn, zones):
+def MV(g_state, turn, zones):
     """
     This is the big one.
     turn in {"P1", "P2"}
     """
     pieces = g_state.getSTATE()[turn]
-    moves = filter((lambda x: x != []), [B(g_state,piece,T.snagBs(piece, zone)) for piece in pieces for zone in zones])
+    As = []
     Bs = []
-    for b in list(itertools.chain.from_iterable(moves)):
-        print "----" + str(b)
-        if b[0] == 'a': 
-            Bs.append(b[2:4])
-        elif b[0] == "B": 
-            Bs.append(nextMovesToList(b))
-        else: 
-            print "Not a or B"
-    return Bs
-    
+    for piece in pieces:
+        for zone in zones:
+            snagged = T.snagBs(piece,zone)
+            for s in snagged:
+                if len(s) == 0: continue
+                if s[0] == 'a': As.append((piece, nextMovesToList(s)))
+                if s[0] == 'B': 
+                    for x in nextMovesToList(B(g_state, piece, s)):
+                        if x: Bs.append((piece, x)) 
+    return [x[0] for x in Counter(As).most_common()] + [x[0] for x in Counter(Bs).most_common()]
 
 
 def main(): 
     g_state = GrammarState()
-    p1Moves =  MOVE(g_state, "P1", [T.mainZone1, T.mainZone2])
-    p2Moves =  MOVE(g_state, "P2", [T.mainZone1, T.mainZone2])
+    print "White Move"
+    p2Moves =  MV(g_state, "P2", [T.mainZone1, T.mainZone2])
+    print p2Moves
+    theMove = p2Moves[0]
+    print "White will move ", str(theMove)
+    piece = theMove[0]
+    dest = C.chessLocationToLocation(theMove[1])
+    pieceNumber = 0
+    for x in range(1,7): 
+        if g_state.getSTATE()["p_" + str(x)] == piece: 
+            print "p_" + str(x)
+            pieceNumber = x
+    source = C.indexToLocation(g_state.getSTATE()["ON_p_" + str(pieceNumber)])
+    movePiece(g_state,theMove[0],source,dest)
+
+
+    p1Moves =  MV(g_state, "P1", [T.mainZone1, T.mainZone2])
     print p1Moves
+    print
+    for y in [8,7,6,5,4,3,2,1]:
+        for x in [1,2,3,4,5,6,7,8]:
+            xi, yi = C.chessLocationToLocation('c6')
+            print R.r_pW(BO.Location(xi,yi),BO.Location(x,y)),
+        print
     """
     movePiece(g_state,"WF",C.chessLocationToLocation("h8"),C.chessLocationToLocation("g7"))
     print B(g_state, "WF", "B(g7:h1)")
     print nextMovesToList(B(g_state, "WF", "B(g7:h1)"))
+    """
+    """
     inputString = "S(0)"
     print "before Start"
     print g_state, inputString

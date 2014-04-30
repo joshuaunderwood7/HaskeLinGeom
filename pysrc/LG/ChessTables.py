@@ -137,6 +137,9 @@ def locationToChessLocation(locat):
     letter = "hgfedcba"[x-1]
     return letter+str(number)
 
+def indexToChessLocation(x):
+    return locationToChessLocation(indexToLocation(x))
+
 def applyToChessBoard(locat, dTable): 
     x0, y0 = locat
     x0 = 9 - x0
