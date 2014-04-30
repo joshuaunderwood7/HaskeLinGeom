@@ -1,5 +1,5 @@
 import ChessTables as C
-import GrammarOfReducedSearches as GRS
+#import GrammarOfReducedSearches as GRS
 
 def B(g_state, piecetype, inputString): 
     """
@@ -31,7 +31,7 @@ def B_prime(g_state, piecetype, start, finish):
             pieceNumber = x
 
     # error check
-    if piecetype == 0:
+    if pieceNumber == 0:
         print "Could not find pice in state"
         return "b(();"
 
@@ -61,8 +61,4 @@ def nextMovesToList(inputString):
     parts = inputString[2:-1].split(';')
     nextMoves = parts[0][1:-1].split(',')
     return nextMoves
-
-g_state = GRS.GrammarState()
-print B(g_state, "WF", "B(h8:h1)")
-print nextMovesToList(B(g_state, "WF", "B(h8:h1)"))
 

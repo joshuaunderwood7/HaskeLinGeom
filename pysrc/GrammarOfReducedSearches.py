@@ -1,8 +1,10 @@
 import re
 import LG.R as R
 #import LG.Piece as P
-import LG.Board as B
+import LG.Board as BO
 import LG.ChessTables as C
+from LG.B import * 
+import LG.transitions as T
 
 
 """ so here I am assuming that the rest of my program written in haskell 
@@ -78,37 +80,37 @@ def CUT(g_state):
 
 def Rp_1():
     global INITIAL_STATE
-    x1 , x2 = B.indexToLocation(INITIAL_STATE['ON_p_1'])
+    x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_1'])
     for i in range(8):
         for j in range(8):
-            INITIAL_STATE["Rp_1_" + str(i+1) + str(j+1)] = R.r_pB(B.Location(x=x1,y=x2),B.Location(x=i+1,y=j+1))
+            INITIAL_STATE["Rp_1_" + str(i+1) + str(j+1)] = R.r_pB(BO.Location(x=x1,y=x2),BO.Location(x=i+1,y=j+1))
 def Rp_2():
     global INITIAL_STATE
-    x1 , x2 = B.indexToLocation(INITIAL_STATE['ON_p_2'])
+    x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_2'])
     for i in range(8):
         for j in range(8):
-            INITIAL_STATE["Rp_2_" + str(i+1) + str(j+1)] = R.r_k(B.Location(x=x1,y=x2),B.Location(x=i+1,y=j+1))
+            INITIAL_STATE["Rp_2_" + str(i+1) + str(j+1)] = R.r_k(BO.Location(x=x1,y=x2),BO.Location(x=i+1,y=j+1))
 def Rp_3():
     global INITIAL_STATE
-    x1 , x2 = B.indexToLocation(INITIAL_STATE['ON_p_3'])
+    x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_3'])
     for i in range(8):
         for j in range(8):
-            INITIAL_STATE["Rp_3_" + str(i+1) + str(j+1)] = R.r_pW(B.Location(x=x1,y=x2),B.Location(x=i+1,y=j+1))
+            INITIAL_STATE["Rp_3_" + str(i+1) + str(j+1)] = R.r_pW(BO.Location(x=x1,y=x2),BO.Location(x=i+1,y=j+1))
 def Rp_4():
     global INITIAL_STATE
-    x1 , x2 = B.indexToLocation(INITIAL_STATE['ON_p_4'])
+    x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_4'])
     for i in range(8):
         for j in range(8):
-            INITIAL_STATE["Rp_4_" + str(i+1) + str(j+1)] = R.r_k(B.Location(x=x1,y=x2),B.Location(x=i+1,y=j+1))
+            INITIAL_STATE["Rp_4_" + str(i+1) + str(j+1)] = R.r_k(BO.Location(x=x1,y=x2),BO.Location(x=i+1,y=j+1))
 def Rp_5():
     global INITIAL_STATE
-    #x1 , x2 = B.indexToLocation(INITIAL_STATE['ON_p_5'])
+    #x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_5'])
     for i in range(8):
         for j in range(8):
             INITIAL_STATE.update({"Rp_5_" + str(i+1) + str(j+1) : False})
 def Rp_6():
     global INITIAL_STATE
-    #x1 , x2 = B.indexToLocation(INITIAL_STATE['ON_p_6'])
+    #x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_6'])
     for i in range(8):
         for j in range(8):
             INITIAL_STATE.update({"Rp_6_" + str(i+1) + str(j+1) : False})
@@ -357,11 +359,45 @@ def q3(g_state, inputString):
         q0(g_state)
         return (g_state, inputString)
 
+def movePiece(g_state, piece, start, dest):
+    STATE = g_state.getSTATE()
+    pieceNumber = 0
+    for x in range(1,7): 
+        if STATE["p_" + str(x)] == piece: 
+            pieceNumber = x
+
+    # error check
+    if pieceNumber == 0:
+        print "Could not find pice in state"
+        return STATE
+
+    if STATE['ON_p_' + str(pieceNumber)] != start:
+        print "p_" + str(pieceNumber) + " is not on " + str(start)
+        return STATE
+    x,y = dest
+    if not STATE['Rp_' + str(pieceNumber) + "_" + str(x) + str(y)]:
+        print "p_" + str(pieceNumber) + " cannot reach " + str(dest)
+        return STATE
+
+    STATE['ON_p_' + str(pieceNumber)] = STATE["x_" + str(C.locationToIndex(dest))]  
+    #T.transition(zone, piece, start, dest):
+
+    Rp_1()
+    Rp_2()
+    Rp_3()
+    Rp_4()
+    Rp_5()
+    Rp_6()
+
+
+
+
 
 def main(): 
     g_state = GrammarState()
-    global INITIAL_STATE
-    print INITIAL_STATE
+    movePiece(g_state,"WF",C.chessLocationToLocation("h8"),C.chessLocationToLocation("g7"))
+    print B(g_state, "WF", "B(h8:h1)")
+    print nextMovesToList(B(g_state, "WF", "B(h8:h1)"))
     """
     inputString = "S(0)"
     print "before Start"
