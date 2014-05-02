@@ -55,29 +55,28 @@ INITIAL_STATE['ON_p_6'] = INITIAL_STATE['x_7']
 
 def CUT(g_state):
     state = g_state.getSTATE()
-    winstate = 0
+    winstate = -1
     if state["ON_p_4"] in [state["x_" + str(x)] for x in range(45,48)] and state["ON_p_1"] == state["x_39"]: 
-        winstate = winstate + 1
+        winstate = 0
     elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(36,40)] and state["ON_p_1"] == state["x_31"]: 
-        winstate = winstate + 1
+        winstate = 0
     elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(28,32)] and state["ON_p_1"] == state["x_23"]: 
-        winstate = winstate + 1
+        winstate = 0
     elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(21,24)] and state["ON_p_1"] == state["x_15"]: 
-        winstate = winstate + 1
+        winstate = 0
     elif state["ON_p_4"] in [state["x_" + str(x)] for x in range(14,16)] and state["ON_p_1"] == state["x_7"]: 
-        winstate = winstate + 1
-    else:
-        winstate = winstate - 1
+        winstate = 0
 
-    if state["ON_p_4"] in [state["x_" + str(x)] for x in [61,53,45,37]] and state["ON_p_2"] == state["x_40"]: 
-        winstate = winstate + 1
+    elif state["ON_p_4"] in [state["x_" + str(x)] for x in [61,53,45,37]] and state["ON_p_2"] == state["x_40"]: 
+        winstate = 0
     elif state["ON_p_4"] in [state["x_" + str(x)] for x in [60,52,44,36]] and state["ON_p_2"] in [41, 49]: 
-        winstate = winstate + 1
-    else:
-        winstate = winstate - 1
+        winstate = 0
 
-    if winstate > 1:   winstate = 1
-    if winstate < -1:  winstate = -1
+    elif state["ON_p_3"] in [58] and state["ON_p_2"] in [40, 41]:
+        winstate = 1
+
+    else:
+        winstate = -1
 
     return (winstate >= 0)
 
@@ -372,7 +371,9 @@ def q3(g_state, inputString):
         return (g_state, inputString)
 
 def movePiece(g_state, piece, start, dest, zone):
-    print "locations before move", [C.indexToChessLocation(g_state.getSTATE()["ON_p_" + str(x)]) for x in range(1,7)]
+    #print "----"
+    #print "locations before move", [C.indexToChessLocation(g_state.getSTATE()["ON_p_" + str(x)]) for x in range(1,7)]
+
     STATE = g_state.getSTATE()
     zoneList = []
     for z in g_state.getZONES():
@@ -392,28 +393,30 @@ def movePiece(g_state, piece, start, dest, zone):
         return g_state
     x,y = dest
     if not STATE['Rp_' + str(pieceNumber) + "_" + str(x) + str(y)]:
-        print "p_" + str(pieceNumber) + " cannot reach " + str(dest)
+        print "p_" + str(pieceNumber) + " cannot reach " + C.locationToChessLocation(dest)
         print 'Rp_' + str(pieceNumber) + "_" + str(x) + str(y) + ' = ' + str(STATE['Rp_' + str(pieceNumber) + "_" + str(x) + str(y)]) 
+        print "locations", ["p_" + str(x) + ":"+ C.indexToChessLocation(g_state.getSTATE()["ON_p_" + str(x)]) for x in range(1,7)]
+        print zone
+        raw_input("enter to contine")
         return g_state
 
     STATE['ON_p_' + str(pieceNumber)] = STATE["x_" + str(C.locationToIndex(dest))]  
     g_state.setSTATE(STATE)
-    print "----------SOURCE-DEST------------"
-    print C.locationToChessLocation(start), C.locationToChessLocation(dest)
-    print "----------ZONE------------"
-    print zone
+    #print "----------SOURCE-DEST------------"
+    #print C.locationToChessLocation(start), C.locationToChessLocation(dest)
+    #print "----------ZONE------------"
+    #print zone
     zone = T.transition(T.objectify(zone), piece, C.locationToChessLocation(start), C.locationToChessLocation(dest))
     zone = T.stringify(zone)
-    print zone
+    #print zone
     zoneList.append(zone)
-    print "----------ZONE------------"
+    #print "----------ZONE------------"
 
     setR(g_state)
     g_state.setZONES(zoneList)
-
     
-    print "locations after move", [C.indexToChessLocation(g_state.getSTATE()["ON_p_" + str(x)]) for x in range(1,7)]
-    print "----"
+    #print "locations after move", [C.indexToChessLocation(g_state.getSTATE()["ON_p_" + str(x)]) for x in range(1,7)]
+    #print "----"
     return g_state
 
 def MV(g_state, turn, zones):
@@ -433,9 +436,9 @@ def MV(g_state, turn, zones):
                 if s[0] == 'a': As.append((piece, zone, nextMovesToList(s)))
                 if s[0] == 'B': 
                     for x in nextMovesToList(B(g_state, piece, s)):
-                        print "made it in B:",s
-                        print "B to b:"
-                        print B(g_state, piece, s)
+                        #print "made it in B:",s
+                        #print "B to b:"
+                        #print B(g_state, piece, s)
                         if x: Bs.append((piece, zone, x)) 
     return [x[0] for x in Counter(As).most_common()] + [x[0] for x in Counter(Bs).most_common()]
 
@@ -444,42 +447,110 @@ def getPieceNumber(g_state, piece):
     pieceNumber = 0
     for x in range(1,7): 
         if g_state.getSTATE()["p_" + str(x)] == piece: 
-            print "p_" + str(x)
+            #print "p_" + str(x)
             pieceNumber = x
     return pieceNumber
 
+def isHappyWithCutVal(player, cutValue):
+    if   player == "P1" and not cutValue: return True
+    elif player == "P2" and     cutValue: return True
+    else: return False
+
+def backupLocations(g_state):
+    return {"ON_p_" + str(x) : g_state.getSTATE()["ON_p_" + str(x)] for x in range(1,7)}
+def restoreLocations(g_state, locatBackup):
+    for x in range(1,7):
+        g_state.getSTATE()["ON_p_" + str(x)] = locatBackup["ON_p_" + str(x)] 
+    return g_state
+
+def backupZones(g_state):
+    return [x for x in g_state.getZONES()]
+def restoreZones(g_state, zoneBackup):
+    g_state.setZONES(zoneBackup)
+    return g_state
+
+maxDepth = 25
+FinalResults = []
+def takeATurn(g_state, currentMover, nextMover, movesSoFar):
+    global maxDepth
+    global FinalResults
+    maxDepth = maxDepth - 1
+
+    if maxDepth == 0:
+        #print "reached maxDepth"
+        maxDepth += 1
+        return g_state, movesSoFar
+
+    if CUT(g_state): 
+        print "CUT State Reached"
+        FinalResults.append(movesSoFar[2:])
+        #raw_input("enter to contine")
+        maxDepth += 1
+        return g_state, movesSoFar
+
+    #if   currentMover == "P1": print "Black Turn"
+    #elif currentMover == "P2": print "White Turn"
+
+    pMoves =  MV(g_state, currentMover, g_state.getZONES())
+    #print "-- move options"
+    #pprint(pMoves)
+
+    isHappy = False
+    if len(pMoves) == 0:
+        print movesSoFar, "(No more moves along this path)"
+        #raw_input("enter to continue")
+        maxDepth += 1
+        return g_state, "No more moves along this path"
+
+    for move in pMoves:
+        bckupl = backupLocations(g_state)
+        bckupz = backupZones(g_state)
+
+        #raw_input("Beginnig of loop")
+        piece = move[0]
+        zone = move[1]
+        dest = C.chessLocationToLocation(move[2])
+        pieceNumber = getPieceNumber(g_state, piece)
+        source = C.indexToLocation(g_state.getSTATE()["ON_p_"+str(pieceNumber)])
+
+
+        moveString = str(C.locationToChessLocation(source)) + '-' + str(C.locationToChessLocation((dest)))
+        #print moveString
+        #pprint(move)
+        statshState = movePiece(g_state,piece,source,dest,zone)
+        result = takeATurn(statshState, nextMover, currentMover, movesSoFar + ', ' + moveString)
+
+        cutResult = CUT(statshState)
+        isHappy = (currentMover == "P1" and not cutResult) or (currentMover == "P2" and cutResult)
+
+        if isHappy: #no more moves are needed to be changed 
+            #raw_input(currentMover+ " is happy. enter to continue")
+            #restoreLocations(g_state, bckup)
+            maxDepth += 1
+            return statshState, str(C.locationToChessLocation(source)) + '-' + str(C.locationToChessLocation((dest))) + ", " + result[1]
+        else:
+            restoreLocations(g_state, bckupl)
+            restoreZones(g_state, bckupz)
+            setR(g_state)
+            #raw_input(currentMover+ " is not happy. enter to continue")
+
+
+    maxDepth += 1
+    return g_state, " There was no sulution down this path "
 
 def main(): 
-    stashedStates = dict()
+    global FinalResults
+
+    print "=================================Here begins the program==========================="
+
+    #stashedStates = dict()
     g_state = GrammarState()
     g_state.setZONES([T.mainZone1, T.mainZone2])
-    stashedStates[0] = deepcopy(g_state) #Start stashing states for pi transitions
-    currentMover, nextMover = ("P1", "P2") #establish turns
+    #stashedStates[0] = deepcopy(g_state) #Start stashing states for pi transitions
+    currentMover, nextMover = ("P2", "P1") #establish turns
 
-    currentMover, nextMover = (nextMover, currentMover) # Change turns
-
-    print currentMover, " turn, P2:White P1:Black"
-    p2Moves =  MV(g_state, currentMover, g_state.getZONES())
-    print "White move options"
-    pprint(p2Moves)
-    theMove = p2Moves[0]
-    print "White will move ", str(theMove)
-    piece = theMove[0]
-    dest = C.chessLocationToLocation(theMove[2])
-
-    pieceNumber = getPieceNumber(g_state, piece)
-
-    source = C.indexToLocation(g_state.getSTATE()["ON_p_" + str(pieceNumber)])
-    g_state = movePiece(g_state,theMove[0],source,dest, theMove[1])
-    print "new white moves"
-    p2Moves =  MV(g_state, currentMover, g_state.getZONES())
-    pprint(p2Moves)
-
-    print "Black Move"
-    p1Moves =  MV(g_state, "P1", g_state.getZONES())
-    pprint(p1Moves)
-    print
-
+    result = takeATurn(g_state, currentMover, nextMover, "" )
+    pprint(FinalResults)
 
 
     """

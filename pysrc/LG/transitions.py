@@ -1,10 +1,9 @@
-#!/usr/local/bin/python2.7
+from ChessTables import distance, chessLocationToLocation
     
 # Simulating Zone Creation. B(x:y) represents the bundle from space x to y
 #  The B function always chooses shortest path, and knows how long the trajectory
 #  is if needed.  May or may not be implemented.
 mainZone1 = "t(BB, a(h5)a(h4)a(h3)a(h2)a(h1), 7)t(WF, B(h8:h5), 3)t(WF, B(h8:h4), 4)t(WF, B(h8:h3), 5)t(WF, B(h8:h2), 6)t(WF, B(h8:h1), 7)"
-
 mainZone2 = "t(WB, a(c6)a(c7)a(c8), 7)t(BF, B(a6:c6), 5)t(BF, B(a6:c7), 6)t(BF, B(a6:c8), 7)t(WF, B(h8:d6), 5)t(WF, B(h8:d7), 6)"
 
 def objectify(zoneString):  # This makes the strings into the objects for this module
@@ -23,14 +22,20 @@ def transition(zone, piece, start, dest):
   if piece == zone[0][0]: # if moving piece is along main trajectory
     for t in zone:
       t[2] = str(int(t[2]) - 1) # decrease time for system
+      if t[1][0] == 'B' and distance(piece, chessLocationToLocation(t[1][2:4]), chessLocationToLocation(t[1][5:7])) > int(t[2]):
+          #print "should remove trajectory", t
+          t[1] = '!'
       if t[1][0] == 'B' and t[1][5:7] == start:
-          print "should remove trajectory", t
+          #print "should remove trajectory", t
           t[1] = '!'
 
   for t in zone:
     if t[0] == piece:
       if t[1][0] == 'a':
         t[1] = t[1][5:]
+        if len(t[1]) == 5:
+            #print "should remove trajectory", t
+            t[1] = '!'
       elif t[1][0] == 'B':
         t[1] = "B(" + dest + t[1][4:]
         t[2] = str(int(t[2]) + 0)

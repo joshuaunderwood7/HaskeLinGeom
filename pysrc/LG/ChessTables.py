@@ -189,3 +189,4 @@ print  distance("BF", (1,8), (5,6))
 pprintChessTable([x+y for x,y in zip(applyToChessBoard((1,8), King),applyToChessBoard((5,6),King))])
 pprintChessTable([str(int(x)+int(y)) for x,y in zip(applyToChessBoard((1,8), King),applyToChessBoard((5,6),King))])
     """
+pprintChessTable(ChessBoard)

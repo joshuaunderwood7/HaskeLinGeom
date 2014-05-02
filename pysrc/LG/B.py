@@ -40,23 +40,23 @@ def B_prime(g_state, piecetype, start, finish):
     distance = C.distance(piecetype, start, finish) 
     bigOval = [str(int(a)+int(b)) for (a,b) in zip(fromDtable, toDTable)]
 
-    C.pprintChessTable(bigOval)
-    print "bigOval[(1,7)]", bigOval[C.locationToIndex((1,7))]
+    #C.pprintChessTable(bigOval)
+    #print "bigOval[(1,7)]", bigOval[C.locationToIndex((1,7))]
 
     bigOval = map((lambda x: int(x) == int(distance)),bigOval) 
 
     # get smallOval (already filtered down to next moves)
-    print "pieceNumber:", pieceNumber
+    #print "pieceNumber:", pieceNumber
     smallOval = []
     for x in range(1,9):
         for y in range(1,9):
-            if x == 1 and y == 7:
-                print "---  --- --- -----           --- ----    -----   ----"
-                print STATE["Rp_"+str(pieceNumber) + "_17"]
-                print bigOval[C.locationToIndex((1,7))]
-                print (1,7) != start
+            #if x == 1 and y == 7:
+                #print "---  --- --- -----           --- ----    -----   ----"
+                #print STATE["Rp_"+str(pieceNumber) + "_17"]
+                #print bigOval[C.locationToIndex((1,7))]
+                #print (1,7) != start
             if STATE["Rp_" + str(pieceNumber) + "_" + str(x) + str(y)] and bigOval[C.locationToIndex((x,y))] and (x,y) != start: 
-                print "IN HERE RIGHT NOW!!!!-------------------------------------------------<<<<"
+                #print "IN HERE RIGHT NOW!!!!-------------------------------------------------<<<<"
                 smallOval.append((x,y))
 
     """
@@ -67,14 +67,14 @@ def B_prime(g_state, piecetype, start, finish):
     print [C.locationToChessLocation((1,7)) for x in [1] if STATE["Rp_"+str(pieceNumber) + "_17"] and bigOval[C.locationToIndex((1,7))]]
     """
 
-    print "smallOval", smallOval
+    #print "smallOval", smallOval
     nextMoves =  map((lambda x: C.locationToChessLocation(x)), smallOval)
-    print "                             Source,dest:",start,finish
-    print "nextMoves:", nextMoves
+    #print "                             Source,dest:",start,finish
+    #print "nextMoves:", nextMoves
 
     returnString = "b(("
     for move in nextMoves:
-        print "++++=====Found a nextMoves"
+        #print "++++=====Found a nextMoves"
         returnString += move + ','
     if len(nextMoves) != 0: # removes extra ','
         returnString = returnString[:-1]
@@ -94,5 +94,4 @@ def nextMovesToList(inputString):
         return nextMoves
     else:
         return []
-
 
