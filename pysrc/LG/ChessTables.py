@@ -141,7 +141,7 @@ def indexToChessLocation(x):
     return locationToChessLocation(indexToLocation(x))
 
 def applyToChessBoard(locat, dTable): 
-    x0, y0 = locat
+    y0, x0 = locat
     x0 = 9 - x0
     offsetBoard = [(x,y) for x in range(x0, x0+8) for y in range(y0, y0+8)] 
     temp =  [dTable[locationToDestIndex(locat)] for locat in offsetBoard]
@@ -163,9 +163,9 @@ def getDistanceboard(piecetype):
 
 
 def pprintChessTable(dTable):
-    for x in range(1,9): 
-        for y in range(1,9):
-            if len(dTable[locationToIndex((x,y))]) < 2: print '',
+    for y in [8,7,6,5,4,3,2,1]: 
+        for x in [8,7,6,5,4,3,2,1]:
+            if len(str(dTable[locationToIndex((x,y))])) < 2: print '',
             print dTable[locationToIndex((x,y))],
         print
 
@@ -179,7 +179,13 @@ def distance(piecetype, fromLocat, toLocat):
     piecetype = getDistanceboard(piecetype)
     return applyToChessBoard(fromLocat, piecetype)[locationToIndex(toLocat)]
 
-#pprintChessTable(ChessBoard)
-#pprintChessTable(applyToChessBoard((5,5), Knight))
-#print  distance("BF", (5,5), (5,6)) 
-
+    """
+pprintChessTable(ChessBoard)
+print
+pprintChessTable(applyToChessBoard((1,8), King))
+print "---"
+pprintChessTable(applyToChessBoard((5,6), King))
+print  distance("BF", (1,8), (5,6)) 
+pprintChessTable([x+y for x,y in zip(applyToChessBoard((1,8), King),applyToChessBoard((5,6),King))])
+pprintChessTable([str(int(x)+int(y)) for x,y in zip(applyToChessBoard((1,8), King),applyToChessBoard((5,6),King))])
+    """

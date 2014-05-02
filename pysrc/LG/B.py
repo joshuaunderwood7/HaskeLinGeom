@@ -1,5 +1,4 @@
 import ChessTables as C
-#import GrammarOfReducedSearches as GRS
 
 def B(g_state, piecetype, inputString): 
     """
@@ -40,14 +39,42 @@ def B_prime(g_state, piecetype, start, finish):
     toDTable = C.applyToChessBoard(finish, C.getDistanceboard(piecetype)) 
     distance = C.distance(piecetype, start, finish) 
     bigOval = [str(int(a)+int(b)) for (a,b) in zip(fromDtable, toDTable)]
+
+    C.pprintChessTable(bigOval)
+    print "bigOval[(1,7)]", bigOval[C.locationToIndex((1,7))]
+
     bigOval = map((lambda x: int(x) == int(distance)),bigOval) 
 
     # get smallOval (already filtered down to next moves)
-    smallOval = [(x,y) for x in range(1,9) for y in range(1,9) if STATE["Rp_" + str(pieceNumber) + "_" + str(x) + str(y)] and bigOval[C.locationToIndex((y,x))] and (x,y) != start] 
+    print "pieceNumber:", pieceNumber
+    smallOval = []
+    for x in range(1,9):
+        for y in range(1,9):
+            if x == 1 and y == 7:
+                print "---  --- --- -----           --- ----    -----   ----"
+                print STATE["Rp_"+str(pieceNumber) + "_17"]
+                print bigOval[C.locationToIndex((1,7))]
+                print (1,7) != start
+            if STATE["Rp_" + str(pieceNumber) + "_" + str(x) + str(y)] and bigOval[C.locationToIndex((x,y))] and (x,y) != start: 
+                print "IN HERE RIGHT NOW!!!!-------------------------------------------------<<<<"
+                smallOval.append((x,y))
+
+    """
+    print STATE["Rp_"+str(pieceNumber) + "_17"]
+    print bigOval[C.locationToIndex((1,7))]
+    print (1,7) != start
+    print [(1,7) for x in [1] if STATE["Rp_"+str(pieceNumber) + "_17"] and bigOval[C.locationToIndex((1,7))]]
+    print [C.locationToChessLocation((1,7)) for x in [1] if STATE["Rp_"+str(pieceNumber) + "_17"] and bigOval[C.locationToIndex((1,7))]]
+    """
+
+    print "smallOval", smallOval
     nextMoves =  map((lambda x: C.locationToChessLocation(x)), smallOval)
+    print "                             Source,dest:",start,finish
+    print "nextMoves:", nextMoves
 
     returnString = "b(("
     for move in nextMoves:
+        print "++++=====Found a nextMoves"
         returnString += move + ','
     if len(nextMoves) != 0: # removes extra ','
         returnString = returnString[:-1]

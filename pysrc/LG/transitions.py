@@ -25,7 +25,7 @@ def transition(zone, piece, start, dest):
       t[2] = str(int(t[2]) - 1) # decrease time for system
       if t[1][0] == 'B' and t[1][5:7] == start:
           print "should remove trajectory", t
-#          t[1] = '!'
+          t[1] = '!'
 
   for t in zone:
     if t[0] == piece:

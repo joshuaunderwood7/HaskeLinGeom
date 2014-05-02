@@ -7,6 +7,8 @@ from LG.B import *
 import LG.transitions as T
 import itertools
 from collections import Counter
+from pprint import pprint
+from copy import deepcopy
 
 
 """ so here I am assuming that the rest of my program written in haskell 
@@ -411,12 +413,14 @@ def movePiece(g_state, piece, start, dest, zone):
 
     
     print "locations after move", [C.indexToChessLocation(g_state.getSTATE()["ON_p_" + str(x)]) for x in range(1,7)]
+    print "----"
     return g_state
 
 def MV(g_state, turn, zones):
     """
     This is the big one.
     turn in {"P1", "P2"}
+    expects zone in list form of strings
     """
     pieces = g_state.getSTATE()[turn]
     As = []
@@ -429,6 +433,9 @@ def MV(g_state, turn, zones):
                 if s[0] == 'a': As.append((piece, zone, nextMovesToList(s)))
                 if s[0] == 'B': 
                     for x in nextMovesToList(B(g_state, piece, s)):
+                        print "made it in B:",s
+                        print "B to b:"
+                        print B(g_state, piece, s)
                         if x: Bs.append((piece, zone, x)) 
     return [x[0] for x in Counter(As).most_common()] + [x[0] for x in Counter(Bs).most_common()]
 
@@ -443,10 +450,18 @@ def getPieceNumber(g_state, piece):
 
 
 def main(): 
+    stashedStates = dict()
     g_state = GrammarState()
     g_state.setZONES([T.mainZone1, T.mainZone2])
-    print "White Move"
-    p2Moves =  MV(g_state, "P2", g_state.getZONES())
+    stashedStates[0] = deepcopy(g_state) #Start stashing states for pi transitions
+    currentMover, nextMover = ("P1", "P2") #establish turns
+
+    currentMover, nextMover = (nextMover, currentMover) # Change turns
+
+    print currentMover, " turn, P2:White P1:Black"
+    p2Moves =  MV(g_state, currentMover, g_state.getZONES())
+    print "White move options"
+    pprint(p2Moves)
     theMove = p2Moves[0]
     print "White will move ", str(theMove)
     piece = theMove[0]
@@ -457,15 +472,13 @@ def main():
     source = C.indexToLocation(g_state.getSTATE()["ON_p_" + str(pieceNumber)])
     g_state = movePiece(g_state,theMove[0],source,dest, theMove[1])
     print "new white moves"
-    p2Moves =  MV(g_state, "P2", g_state.getZONES())
+    p2Moves =  MV(g_state, currentMover, g_state.getZONES())
+    pprint(p2Moves)
 
-    print
     print "Black Move"
     p1Moves =  MV(g_state, "P1", g_state.getZONES())
-    from pprint import pprint
     pprint(p1Moves)
     print
-
 
 
 
