@@ -23,6 +23,9 @@ def transition(zone, piece, start, dest):
   if piece == zone[0][0]: # if moving piece is along main trajectory
     for t in zone:
       t[2] = str(int(t[2]) - 1) # decrease time for system
+      if t[1][0] == 'B' and t[1][5:7] == start:
+          print "should remove trajectory", t
+#          t[1] = '!'
 
   for t in zone:
     if t[0] == piece:
@@ -31,7 +34,8 @@ def transition(zone, piece, start, dest):
       elif t[1][0] == 'B':
         t[1] = "B(" + dest + t[1][4:]
         t[2] = str(int(t[2]) + 0)
-  return zone
+
+  return [z for z in zone if z[1] != '!']
 
 def printZone(zone):
   print stringify(zone)

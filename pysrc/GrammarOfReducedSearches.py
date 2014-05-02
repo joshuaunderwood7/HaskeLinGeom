@@ -80,55 +80,55 @@ def CUT(g_state):
     return (winstate >= 0)
 
 
-def Rp_1():
-    global INITIAL_STATE
+def Rp_1(g_state):
+    INITIAL_STATE = g_state.getSTATE()
     x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_1'])
     for i in range(8):
         for j in range(8):
-            INITIAL_STATE["Rp_1_" + str(i+1) + str(j+1)] = R.r_pB(BO.Location(x=x1,y=x2),BO.Location(x=i+1,y=j+1))
-def Rp_2():
-    global INITIAL_STATE
+            locat = BO.Location(x=i+1,y=j+1)
+            INITIAL_STATE["Rp_1_" + str(locat.x) + str(locat.y)] = R.r_pB(BO.Location(x=x1,y=x2),locat)
+def Rp_2(g_state):
+    INITIAL_STATE = g_state.getSTATE()
     x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_2'])
     for i in range(8):
         for j in range(8):
-            INITIAL_STATE["Rp_2_" + str(i+1) + str(j+1)] = R.r_k(BO.Location(x=x1,y=x2),BO.Location(x=i+1,y=j+1))
-def Rp_3():
-    global INITIAL_STATE
+            locat = BO.Location(x=i+1,y=j+1)
+            INITIAL_STATE["Rp_2_" + str(locat.x) + str(locat.y)] = R.r_k(BO.Location(x=x1,y=x2),locat)
+def Rp_3(g_state):
+    INITIAL_STATE = g_state.getSTATE()
     x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_3'])
     for i in range(8):
         for j in range(8):
-            INITIAL_STATE["Rp_3_" + str(i+1) + str(j+1)] = R.r_pW(BO.Location(x=x1,y=x2),BO.Location(x=i+1,y=j+1))
-def Rp_4():
-    global INITIAL_STATE
+            locat = BO.Location(x=i+1,y=j+1)
+            INITIAL_STATE["Rp_3_" + str(locat.x) + str(locat.y)] = R.r_pW(BO.Location(x=x1,y=x2),locat)
+def Rp_4(g_state):
+    INITIAL_STATE = g_state.getSTATE()
     x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_4'])
     for i in range(8):
         for j in range(8):
-            INITIAL_STATE["Rp_4_" + str(i+1) + str(j+1)] = R.r_k(BO.Location(x=x1,y=x2),BO.Location(x=i+1,y=j+1))
-def Rp_5():
-    pass
-    #global INITIAL_STATE
-    ##x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_5'])
-    #for i in range(8):
-    #    for j in range(8):
-    #        INITIAL_STATE.update({"Rp_5_" + str(i+1) + str(j+1) : False})
-def Rp_6():
-    pass
-    #global INITIAL_STATE
-    ##x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_6'])
-    #for i in range(8):
-    #    for j in range(8):
-    #        INITIAL_STATE.update({"Rp_6_" + str(i+1) + str(j+1) : False})
+            locat = BO.Location(x=i+1,y=j+1)
+            INITIAL_STATE["Rp_4_" + str(locat.x) + str(locat.y)] = R.r_k(BO.Location(x=x1,y=x2),locat)
+def Rp_5(g_state):
+    INITIAL_STATE = g_state.getSTATE()
+    #x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_5'])
+    for i in range(8):
+        for j in range(8):
+            INITIAL_STATE.update({"Rp_5_" + str(i+1) + str(j+1) : False})
+def Rp_6(g_state):
+    INITIAL_STATE = g_state.getSTATE()
+    #x1 , x2 = BO.indexToLocation(INITIAL_STATE['ON_p_6'])
+    for i in range(8):
+        for j in range(8):
+            locat = BO.Location(x=i+1,y=j+1)
+            INITIAL_STATE.update({"Rp_6_" + str(i+1) + str(j+1) : False})
 
-Rp_1()
-Rp_2()
-Rp_3()
-Rp_4()
-Rp_5()
-Rp_6()
-
-#from pprint import pprint
-#pprint(INITIAL_STATE)
-
+def setR(g_state):
+    Rp_1(g_state)
+    Rp_2(g_state)
+    Rp_3(g_state)
+    Rp_4(g_state)
+    Rp_5(g_state)
+    Rp_6(g_state)
 
 class GrammarState():
     def __init__(self):
@@ -148,6 +148,9 @@ class GrammarState():
         self._SIGN  = 1 
         self._STATE = INITIAL_STATE
         self.BIG_NUMBER = 256
+        setR(self)
+        # here I added ZONES storage
+        self.ZONES = []
 
     def _setter(self, var, index, val):
         while index >= len(var):
@@ -168,6 +171,9 @@ class GrammarState():
     def setSIGN(self, value) : self._SIGN= value; return self
     def getD(self): return self._d
     def setD(self, value) : self._d= value; return self
+
+    def getZONES(self): return self._ZONES
+    def setZONES(self, value) : self._ZONES = value; return self
     def getSTATE(self): return self._STATE
     def setSTATE(self, value) : self._STATE = value; return self
 
@@ -363,8 +369,12 @@ def q3(g_state, inputString):
         q0(g_state)
         return (g_state, inputString)
 
-def movePiece(g_state, piece, start, dest):
+def movePiece(g_state, piece, start, dest, zone):
+    print "locations before move", [C.indexToChessLocation(g_state.getSTATE()["ON_p_" + str(x)]) for x in range(1,7)]
     STATE = g_state.getSTATE()
+    zoneList = []
+    for z in g_state.getZONES():
+        if z != zone: zoneList.append(z)
     pieceNumber = 0
     for x in range(1,7): 
         if STATE["p_" + str(x)] == piece: 
@@ -373,26 +383,35 @@ def movePiece(g_state, piece, start, dest):
     # error check
     if pieceNumber == 0:
         print "Could not find pice in state"
-        return STATE
+        return g_state
 
     if STATE['ON_p_' + str(pieceNumber)] != C.locationToIndex(start):
         print "p_" + str(pieceNumber) + " is not on " + str(start)
-        return STATE
+        return g_state
     x,y = dest
     if not STATE['Rp_' + str(pieceNumber) + "_" + str(x) + str(y)]:
         print "p_" + str(pieceNumber) + " cannot reach " + str(dest)
         print 'Rp_' + str(pieceNumber) + "_" + str(x) + str(y) + ' = ' + str(STATE['Rp_' + str(pieceNumber) + "_" + str(x) + str(y)]) 
-        return STATE
+        return g_state
 
     STATE['ON_p_' + str(pieceNumber)] = STATE["x_" + str(C.locationToIndex(dest))]  
-    #T.transition(zone, piece, start, dest):
+    g_state.setSTATE(STATE)
+    print "----------SOURCE-DEST------------"
+    print C.locationToChessLocation(start), C.locationToChessLocation(dest)
+    print "----------ZONE------------"
+    print zone
+    zone = T.transition(T.objectify(zone), piece, C.locationToChessLocation(start), C.locationToChessLocation(dest))
+    zone = T.stringify(zone)
+    print zone
+    zoneList.append(zone)
+    print "----------ZONE------------"
 
-    Rp_1()
-    Rp_2()
-    Rp_3()
-    Rp_4()
-    Rp_5()
-    Rp_6()
+    setR(g_state)
+    g_state.setZONES(zoneList)
+
+    
+    print "locations after move", [C.indexToChessLocation(g_state.getSTATE()["ON_p_" + str(x)]) for x in range(1,7)]
+    return g_state
 
 def MV(g_state, turn, zones):
     """
@@ -407,39 +426,49 @@ def MV(g_state, turn, zones):
             snagged = T.snagBs(piece,zone)
             for s in snagged:
                 if len(s) == 0: continue
-                if s[0] == 'a': As.append((piece, nextMovesToList(s)))
+                if s[0] == 'a': As.append((piece, zone, nextMovesToList(s)))
                 if s[0] == 'B': 
                     for x in nextMovesToList(B(g_state, piece, s)):
-                        if x: Bs.append((piece, x)) 
+                        if x: Bs.append((piece, zone, x)) 
     return [x[0] for x in Counter(As).most_common()] + [x[0] for x in Counter(Bs).most_common()]
 
 
-def main(): 
-    g_state = GrammarState()
-    print "White Move"
-    p2Moves =  MV(g_state, "P2", [T.mainZone1, T.mainZone2])
-    print p2Moves
-    theMove = p2Moves[0]
-    print "White will move ", str(theMove)
-    piece = theMove[0]
-    dest = C.chessLocationToLocation(theMove[1])
+def getPieceNumber(g_state, piece):
     pieceNumber = 0
     for x in range(1,7): 
         if g_state.getSTATE()["p_" + str(x)] == piece: 
             print "p_" + str(x)
             pieceNumber = x
+    return pieceNumber
+
+
+def main(): 
+    g_state = GrammarState()
+    g_state.setZONES([T.mainZone1, T.mainZone2])
+    print "White Move"
+    p2Moves =  MV(g_state, "P2", g_state.getZONES())
+    theMove = p2Moves[0]
+    print "White will move ", str(theMove)
+    piece = theMove[0]
+    dest = C.chessLocationToLocation(theMove[2])
+
+    pieceNumber = getPieceNumber(g_state, piece)
+
     source = C.indexToLocation(g_state.getSTATE()["ON_p_" + str(pieceNumber)])
-    movePiece(g_state,theMove[0],source,dest)
+    g_state = movePiece(g_state,theMove[0],source,dest, theMove[1])
+    print "new white moves"
+    p2Moves =  MV(g_state, "P2", g_state.getZONES())
 
-
-    p1Moves =  MV(g_state, "P1", [T.mainZone1, T.mainZone2])
-    print p1Moves
     print
-    for y in [8,7,6,5,4,3,2,1]:
-        for x in [1,2,3,4,5,6,7,8]:
-            xi, yi = C.chessLocationToLocation('c6')
-            print R.r_pW(BO.Location(xi,yi),BO.Location(x,y)),
-        print
+    print "Black Move"
+    p1Moves =  MV(g_state, "P1", g_state.getZONES())
+    from pprint import pprint
+    pprint(p1Moves)
+    print
+
+
+
+
     """
     movePiece(g_state,"WF",C.chessLocationToLocation("h8"),C.chessLocationToLocation("g7"))
     print B(g_state, "WF", "B(g7:h1)")
